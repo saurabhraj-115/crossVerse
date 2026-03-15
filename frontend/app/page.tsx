@@ -108,9 +108,9 @@ export default function HomePage() {
       </section>
 
       {/* Quick Topics */}
-      <section className="border-b border-gray-200 bg-white px-4 py-8">
+      <section className="border-b border-gray-200 bg-white px-4 py-8 dark:border-gray-800 dark:bg-gray-900">
         <div className="mx-auto max-w-5xl">
-          <p className="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-gray-500">
+          <p className="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
             Explore by topic
           </p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -118,7 +118,7 @@ export default function HomePage() {
               <Link
                 key={label}
                 href={`/compare?topic=${encodeURIComponent(label)}`}
-                className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-indigo-300 hover:text-indigo-700 transition-colors shadow-sm"
+                className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-indigo-300 hover:text-indigo-700 transition-colors shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
               >
                 <span>{emoji}</span> {label}
               </Link>
@@ -130,10 +130,10 @@ export default function HomePage() {
       {/* Features */}
       <section className="px-4 py-16">
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-3 text-center text-3xl font-bold text-gray-900">
+          <h2 className="mb-3 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
             Four ways to explore scripture
           </h2>
-          <p className="mb-10 text-center text-gray-500">
+          <p className="mb-10 text-center text-gray-500 dark:text-gray-400">
             From quick answers to deep cross-tradition analysis
           </p>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -141,13 +141,13 @@ export default function HomePage() {
               <Link
                 key={href}
                 href={href}
-                className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1"
+                className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 dark:border-gray-700 dark:bg-gray-900 dark:hover:shadow-none dark:hover:border-gray-600"
               >
-                <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl ${bg} ${color}`}>
+                <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl ${bg} ${color} dark:bg-opacity-20`}>
                   <Icon size={24} />
                 </div>
-                <h3 className="mb-2 font-bold text-gray-900">{title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+                <h3 className="mb-2 font-bold text-gray-900 dark:text-gray-100">{title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed dark:text-gray-400">{description}</p>
                 <div className={`mt-4 flex items-center gap-1 text-sm font-medium ${color} opacity-0 group-hover:opacity-100 transition-opacity`}>
                   Explore <ArrowRight size={14} />
                 </div>
@@ -193,8 +193,8 @@ export default function HomePage() {
       {/* How it works */}
       <section className="px-4 py-16">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mb-3 text-3xl font-bold text-gray-900">How it works</h2>
-          <p className="mb-10 text-gray-500">Grounded, transparent, and citation-first</p>
+          <h2 className="mb-3 text-3xl font-bold text-gray-900 dark:text-gray-100">How it works</h2>
+          <p className="mb-10 text-gray-500 dark:text-gray-400">Grounded, transparent, and citation-first</p>
           <div className="grid gap-8 sm:grid-cols-3">
             {[
               { step: '1', title: 'You ask', desc: 'Type any theological, ethical, or philosophical question.' },
@@ -205,8 +205,8 @@ export default function HomePage() {
                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-lg font-extrabold text-white">
                   {step}
                 </div>
-                <h3 className="mb-1 font-bold text-gray-900">{title}</h3>
-                <p className="text-sm text-gray-500">{desc}</p>
+                <h3 className="mb-1 font-bold text-gray-900 dark:text-gray-100">{title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{desc}</p>
               </div>
             ))}
           </div>
@@ -214,11 +214,11 @@ export default function HomePage() {
       </section>
 
       {/* Footer CTA */}
-      <section className="border-t border-gray-200 bg-white px-4 py-12 text-center">
-        <h2 className="mb-3 text-2xl font-bold text-gray-900">
+      <section className="border-t border-gray-200 bg-white px-4 py-12 text-center dark:border-gray-800 dark:bg-gray-900">
+        <h2 className="mb-3 text-2xl font-bold text-gray-900 dark:text-gray-100">
           Ready to explore?
         </h2>
-        <p className="mb-6 text-gray-500">Start with a question, a comparison, or a debate.</p>
+        <p className="mb-6 text-gray-500 dark:text-gray-400">Start with a question, a comparison, or a debate.</p>
         <Link
           href="/query"
           className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-8 py-3 font-semibold text-white hover:bg-indigo-700 transition-colors shadow-lg"
