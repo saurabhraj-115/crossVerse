@@ -24,6 +24,12 @@ from scripts.ingest_guru_granth_full import ingest_guru_granth_full
 from scripts.ingest_tanakh_full import ingest_tanakh_full
 from scripts.ingest_hadith_full import ingest_hadith_full
 from scripts.ingest_upanishads_full import ingest_upanishads_full
+from scripts.ingest_upanishads_more import ingest_upanishads_more
+from scripts.ingest_bhagavatam import ingest_bhagavatam
+from scripts.ingest_ramayana import ingest_ramayana
+from scripts.ingest_mahabharata import ingest_mahabharata
+from scripts.ingest_manusmriti import ingest_manusmriti
+from scripts.ingest_vedas import ingest_vedas
 
 logging.basicConfig(
     level=logging.INFO,
@@ -35,7 +41,13 @@ INGESTION_STEPS = [
     # Hinduism
     ("Bhagavad Gita – full 700 verses", ingest_gita_full),
     ("Yoga Sutras – full 196 sutras", ingest_yoga_sutras_full),
-    ("Upanishads – 12 principal", ingest_upanishads_full),
+    ("Upanishads – Isa/Katha/Kena (Paramananda)", ingest_upanishads_full),
+    ("Upanishads – 9 more (Chandogya, Aitareya, Kaushitaki, Mundaka, Taittiriya, Brihadaranyaka, Svetasvatara, Maitrayani, Prashna)", ingest_upanishads_more),
+    ("Bhagavata Purana – 12 Cantos", ingest_bhagavatam),
+    ("Ramayana – Griffith translation", ingest_ramayana),
+    ("Mahabharata – Ganguli translation (18 Parvas)", ingest_mahabharata),
+    ("Manusmriti – Bühler translation (12 chapters)", ingest_manusmriti),
+    ("The Four Vedas – Griffith translations", ingest_vedas),
     # Buddhism
     ("Dhammapada – full 423 verses", ingest_dhammapada_full),
     # Sikhism
