@@ -11,7 +11,7 @@ import {
   RELIGION_EMOJI,
 } from '@/lib/types';
 import ChatMessageComponent from '@/components/ui/ChatMessage';
-import { Send, Loader2, GraduationCap, MessageCircle } from 'lucide-react';
+import { Send, Loader2, GraduationCap, MessageCircle, Mic, MicOff } from 'lucide-react';
 import clsx from 'clsx';
 
 const QUICK_QUESTIONS = [
@@ -29,8 +29,10 @@ export default function QueryChat() {
   const [mode, setMode] = useState<QueryMode>('simple');
   const [selectedReligions, setSelectedReligions] = useState<Religion[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [listening, setListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -95,6 +97,43 @@ export default function QueryChat() {
       e.preventDefault();
       sendMessage(input);
     }
+  };
+
+  const toggleVoice = () => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setError('Voice input is not supported in this browser. Try Chrome or Edge.');
+      return;
+    }
+
+    if (listening) {
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognitionRef.current = recognition;
+
+    recognition.onstart = () => setListening(true);
+    recognition.onend = () => setListening(false);
+    recognition.onerror = () => setListening(false);
+
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results as any[])
+        .map((r: any) => r[0].transcript)
+        .join('');
+      setInput(transcript);
+      if (event.results[event.results.length - 1].isFinal) {
+        recognition.stop();
+      }
+    };
+
+    recognition.start();
   };
 
   return (
@@ -221,6 +260,20 @@ export default function QueryChat() {
               style={{ maxHeight: '120px' }}
               disabled={loading}
             />
+            <button
+              type="button"
+              onClick={toggleVoice}
+              disabled={loading}
+              className={clsx(
+                'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-40',
+                listening
+                  ? 'bg-red-500 text-white animate-pulse'
+                  : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300'
+              )}
+              title={listening ? 'Stop recording' : 'Voice input'}
+            >
+              {listening ? <MicOff size={15} /> : <Mic size={15} />}
+            </button>
             <button
               type="submit"
               disabled={!input.trim() || loading}
