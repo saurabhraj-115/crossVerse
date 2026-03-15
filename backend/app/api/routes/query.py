@@ -15,10 +15,15 @@ async def ask_question(request: QueryRequest) -> QueryResponse:
     grounded answer with citations.
     """
     try:
+        history = (
+            [{"role": m.role, "content": m.content} for m in request.history]
+            if request.history else None
+        )
         return await query_scriptures(
             question=request.question,
             religions=request.religions,
             mode=request.mode,
+            history=history,
         )
     except Exception as exc:
         logger.exception("Error in /query: %s", exc)
