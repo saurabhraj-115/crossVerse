@@ -7,7 +7,10 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from app.api.routes import query, compare, contradictions, verse, debate, topics
+from app.api.routes import (
+    query, compare, contradictions, verse, debate, topics,
+    situations, factcheck, ethics, daily, fingerprint, similarity, study, archaeology,
+)
 from app.core.config import get_settings
 from app.core.qdrant_client import ensure_collection_exists
 
@@ -68,6 +71,14 @@ app.include_router(contradictions.router, tags=["Contradictions"])
 app.include_router(verse.router, tags=["Verse"])
 app.include_router(debate.router, tags=["Debate"])
 app.include_router(topics.router, tags=["Topics"])
+app.include_router(situations.router, tags=["Situations"])
+app.include_router(factcheck.router, tags=["FactCheck"])
+app.include_router(ethics.router, tags=["Ethics"])
+app.include_router(daily.router, tags=["Daily"])
+app.include_router(fingerprint.router, tags=["Fingerprint"])
+app.include_router(similarity.router, tags=["Similarity"])
+app.include_router(study.router, tags=["Study"])
+app.include_router(archaeology.router, tags=["Archaeology"])
 
 
 @app.get("/", tags=["Health"])

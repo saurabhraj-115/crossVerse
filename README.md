@@ -2,35 +2,50 @@
 
 CrossVerse is an AI-powered platform for exploring sacred scripture across six major world religions. It uses RAG (Retrieval Augmented Generation) to answer questions grounded exclusively in scripture text — no opinion, no commentary, always cited.
 
-## Supported Traditions
+## Scripture Database
 
-| Religion | Scripture | Translation |
-|----------|-----------|-------------|
-| Christianity | King James Bible | KJV |
-| Islam | The Holy Quran | Sahih International |
-| Hinduism | Bhagavad Gita | Public Domain |
-| Buddhism | Dhammapada | F. Max Müller (1881) |
-| Judaism | Torah / Tanakh | *(extend via ingestion script)* |
-| Sikhism | Guru Granth Sahib | Public Domain |
+**94,500+ verses** across all six traditions:
+
+| Religion | Scriptures | Verses |
+|----------|-----------|--------|
+| Christianity | King James Bible (full) | 31,100 |
+| Islam | The Holy Quran (full) + Sahih Bukhari Hadith | 13,813 |
+| Judaism | Full Tanakh (39 books, Sefaria / JPS 1917) | 23,307 |
+| Sikhism | Guru Granth Sahib (full, BaniDB) | 24,703 |
+| Hinduism | Bhagavad Gita · Yoga Sutras · Isa, Katha, Kena Upanishads | 1,089 |
+| Buddhism | Dhammapada (full, SuttaCentral / Bhikkhu Sujato) | 514 |
 
 ## Features
 
-- **Ask** — Chat interface for scripture-grounded Q&A with citations
-- **Compare** — Side-by-side view of what each tradition says about any topic
-- **Debate** — Each tradition's scriptures respond to a question independently
-- **Explore** — Curated topic browser across 7 categories and 35+ topics
-- **Contradictions** — Find apparent tensions within a single tradition
+| Feature | Description |
+|---------|-------------|
+| **Ask** | Scripture-grounded Q&A with citations — Simple, Scholar, or Child mode |
+| **Compare** | Side-by-side view of what each tradition says about any topic |
+| **Debate** | Each tradition's scriptures respond to a question independently |
+| **Explore** | Curated topic browser across 7 categories and 35+ topics |
+| **Contradictions** | Find apparent tensions within a single tradition |
+| **Life Situations** | Get scripture wisdom for specific life moments (grief, marriage, career…) |
+| **Fact Check** | Verify religious claims against actual scripture |
+| **Ethics** | Multi-tradition ethical perspectives on moral dilemmas |
+| **Daily Briefing** | A new spiritual theme each day with verses from all 6 traditions |
+| **Spiritual Fingerprint** | Answer questions, discover which tradition resonates most |
+| **Concept Archaeology** | Trace how an idea (forgiveness, soul, justice…) evolved across traditions |
+| **Semantic Graph** | Visual force-directed graph of verse similarities across traditions |
+| **Study Plans** | AI-generated multi-week study plans on any topic |
+| **Voice Input** | Speak your question — mic transcription built in |
+| **Share & Cite** | Native OS share sheet + Chicago / MLA / SBL citation formats per verse |
+| **Dark Mode** | Full dark mode across all pages |
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
-| Backend | FastAPI (Python 3.11) |
-| Vector DB | Qdrant |
+| Backend | FastAPI (Python 3.9) |
+| Vector DB | Qdrant (local binary) |
 | Embeddings | OpenAI `text-embedding-3-small` |
-| LLM | OpenAI `gpt-4o` |
+| LLM | Anthropic Claude Sonnet 4.6 |
 | Frontend | Next.js 14 (App Router) + Tailwind CSS |
-| Container | Docker + Docker Compose |
+| UI Components | Lucide Icons, next-themes |
 
 ---
 
@@ -38,54 +53,63 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across six m
 
 ### Prerequisites
 
-- Docker and Docker Compose
+- Python 3.9+
 - Node.js 18+
-- An OpenAI API key
+- An OpenAI API key (embeddings)
+- An Anthropic API key (LLM)
+- Qdrant binary ([download here](https://qdrant.tech/documentation/quick-start/))
 
 ### 1. Clone and configure
 
 ```bash
 git clone <repo-url>
-cd crossVerse
+cd crossVerse/backend
 
-# Create the backend .env file
-cp backend/.env.example backend/.env
-# Edit backend/.env and set your OPENAI_API_KEY
+cp .env.example .env
+# Edit .env and set:
+#   OPENAI_API_KEY=sk-...
+#   ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-### 2. Start Qdrant + Backend via Docker Compose
+### 2. Start Qdrant
 
 ```bash
-docker-compose up -d
+# Download the Qdrant binary for your platform, then:
+./qdrant &
+# Dashboard available at http://localhost:6333/dashboard
 ```
 
-The backend will be available at `http://localhost:8000`.
-Qdrant dashboard: `http://localhost:6333/dashboard`
+### 3. Start the Backend
 
-### 3. Ingest Scripture Data
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
 
-Run the ingestion scripts once to populate the vector database:
+API docs: `http://localhost:8000/docs`
+
+### 4. Ingest Scripture Data
 
 ```bash
 cd backend
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Run all ingestion (takes ~10-20 minutes depending on API rate limits)
+# Run all ingestion (takes ~30-60 min depending on API rate limits)
 python -m scripts.run_all_ingestion
 
 # Or run individual scripts:
-python -m scripts.ingest_gita           # Bhagavad Gita (~70 verses)
-python -m scripts.ingest_dhammapada     # Dhammapada (~100 verses)
-python -m scripts.ingest_guru_granth    # Guru Granth Sahib (~40 passages)
-python -m scripts.ingest_quran          # Full Quran (~6236 ayahs)
-python -m scripts.ingest_bible          # Full KJV Bible (~31,000 verses)
+python -m scripts.ingest_bible_full          # KJV Bible — 31,100 verses
+python -m scripts.ingest_quran_full          # Full Quran — 6,236 ayahs
+python -m scripts.ingest_hadith_full         # Sahih Bukhari Hadith — 7,577
+python -m scripts.ingest_tanakh_full         # Full Tanakh (Sefaria) — 23,307 verses
+python -m scripts.ingest_guru_granth_full    # Guru Granth Sahib (BaniDB) — 24,703 passages
+python -m scripts.ingest_gita_full           # Bhagavad Gita — 700 verses
+python -m scripts.ingest_yoga_sutras_full    # Yoga Sutras — 196 sutras
+python -m scripts.ingest_dhammapada_full     # Dhammapada — 423 verses
+python -m scripts.ingest_upanishads_full     # Principal Upanishads (Gutenberg) — 171 verses
 ```
 
-> **Note:** The Bible and Quran scripts download data from public APIs. The Gita, Dhammapada, and Guru Granth Sahib use curated public-domain datasets included in the scripts.
-
-### 4. Start the Frontend
+### 5. Start the Frontend
 
 ```bash
 cd frontend
@@ -97,60 +121,52 @@ Frontend available at `http://localhost:3000`.
 
 ---
 
-## Development
-
-### Backend (without Docker)
-
-```bash
-cd backend
-pip install -r requirements.txt
-cp .env.example .env
-# Set OPENAI_API_KEY and ensure Qdrant is running locally
-
-uvicorn app.main:app --reload --port 8000
-```
-
-API documentation: `http://localhost:8000/docs`
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Set `NEXT_PUBLIC_API_URL=http://localhost:8000` in `frontend/.env.local` if needed.
-
----
-
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/query` | Main RAG Q&A endpoint |
-| `POST` | `/compare` | Compare religions on a topic |
-| `POST` | `/debate` | Multi-religion scripture debate |
+| `POST` | `/query` | Main RAG Q&A — supports mode (simple/scholar/child), language, history |
+| `POST` | `/compare` | Compare traditions on any topic |
+| `POST` | `/debate` | Multi-tradition scripture debate |
 | `POST` | `/contradictions` | Find tensions within one tradition |
-| `GET` | `/verse/{religion}/{ref}` | Look up a specific verse |
-| `GET` | `/topics` | Get curated topic list |
-| `GET` | `/health` | Health check |
-| `GET` | `/docs` | Interactive API documentation |
+| `POST` | `/situations` | Scripture wisdom for life situations |
+| `POST` | `/factcheck` | Verify a religious claim against scripture |
+| `POST` | `/ethics` | Multi-tradition ethical perspectives |
+| `POST` | `/study` | Generate a multi-week study plan |
+| `POST` | `/archaeology` | Trace a concept's development across traditions |
+| `POST` | `/similarity/verse` | Find semantically similar verses cross-tradition |
+| `POST` | `/similarity/graph` | Graph data for semantic similarity visualization |
+| `POST` | `/fingerprint/analyze` | Analyze a user's spiritual fingerprint |
+| `GET`  | `/fingerprint/questions` | Questions for spiritual fingerprint quiz |
+| `GET`  | `/daily` | Daily scripture briefing (theme + verses per tradition) |
+| `GET`  | `/daily?fresh=true` | New random theme and verses |
+| `GET`  | `/verse/{religion}/{ref}` | Look up a specific verse by reference |
+| `GET`  | `/topics` | Curated topic list |
+| `GET`  | `/health` | Health check |
+| `GET`  | `/docs` | Interactive API documentation (Swagger) |
 
-### Example: Query
+### Example: Ask a question
 
 ```bash
 curl -X POST http://localhost:8000/query \
   -H "Content-Type: application/json" \
-  -d '{"question": "What does scripture say about forgiveness?", "mode": "simple"}'
+  -d '{"question": "What does scripture say about forgiveness?", "mode": "scholar"}'
 ```
 
-### Example: Compare
+### Example: Compare traditions
 
 ```bash
 curl -X POST http://localhost:8000/compare \
   -H "Content-Type: application/json" \
   -d '{"topic": "forgiveness", "religions": ["Christianity", "Islam", "Buddhism"]}'
+```
+
+### Example: Concept Archaeology
+
+```bash
+curl -X POST http://localhost:8000/archaeology \
+  -H "Content-Type: application/json" \
+  -d '{"concept": "compassion"}'
 ```
 
 ---
@@ -161,22 +177,38 @@ curl -X POST http://localhost:8000/compare \
 crossVerse/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py              # FastAPI app entry point
-│   │   ├── api/routes/          # All API route handlers
-│   │   ├── core/                # Config, Qdrant client, OpenAI client
-│   │   ├── models/schemas.py    # Pydantic data models
-│   │   └── services/            # RAG pipeline, embeddings, scripture utils
-│   ├── scripts/                 # Data ingestion scripts
+│   │   ├── main.py                  # FastAPI app entry point + router registration
+│   │   ├── api/routes/              # Route handlers (query, compare, debate, daily, …)
+│   │   ├── core/                    # Config, Qdrant client, Anthropic LLM client
+│   │   ├── models/schemas.py        # Pydantic request/response models
+│   │   └── services/                # RAG pipeline, embeddings, scripture utils
+│   ├── scripts/                     # Data ingestion scripts (one per scripture)
 │   ├── requirements.txt
 │   ├── .env.example
 │   └── Dockerfile
 ├── frontend/
-│   ├── app/                     # Next.js App Router pages
-│   ├── components/              # React components
-│   ├── lib/                     # API client, TypeScript types
-│   ├── package.json
+│   ├── app/                         # Next.js App Router pages
+│   │   ├── page.tsx                 # Home / Ask
+│   │   ├── compare/                 # Compare traditions
+│   │   ├── debate/                  # Debate engine
+│   │   ├── daily/                   # Daily briefing
+│   │   ├── situations/              # Life situations
+│   │   ├── fingerprint/             # Spiritual fingerprint quiz
+│   │   ├── graph/                   # Semantic similarity graph
+│   │   ├── study/                   # Study plans
+│   │   ├── archaeology/             # Concept archaeology
+│   │   ├── factcheck/               # Fact checker
+│   │   └── ethics/                  # Ethics perspectives
+│   ├── components/
+│   │   ├── ui/                      # VerseCard, ReligionBadge, …
+│   │   ├── QueryChat.tsx            # Main chat interface
+│   │   ├── CompareView.tsx          # Side-by-side comparison
+│   │   └── Navbar.tsx               # Navigation
+│   ├── lib/
+│   │   ├── api.ts                   # API client functions
+│   │   └── types.ts                 # TypeScript interfaces
 │   └── tailwind.config.js
-├── data/                        # Scripture raw/processed data directories
+├── data/                            # Raw scripture data directories
 ├── docker-compose.yml
 └── README.md
 ```
@@ -185,11 +217,12 @@ crossVerse/
 
 ## Design Principles
 
-1. **Scripture-only answers** — The LLM is strictly instructed to answer only from retrieved passages
-2. **Always cite** — Every claim must include a citation reference like [1], [2]
+1. **Scripture-only answers** — Claude is strictly instructed to answer only from retrieved passages
+2. **Always cite** — Every claim must include a passage reference like [1], [2]
 3. **No opinion** — The system never adds commentary, interpretation, or personal views
 4. **Transparency** — All source passages are returned alongside every answer
-5. **Impartiality** — All traditions are treated equally; no tradition is privileged
+5. **Impartiality** — All traditions are treated with equal respect; none is privileged
+6. **Guardrails** — Off-topic queries (coding, trivia, general chat) are redirected toward scripture
 
 ---
 
@@ -197,9 +230,12 @@ crossVerse/
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `OPENAI_API_KEY` | *(required)* | Your OpenAI API key |
+| `OPENAI_API_KEY` | *(required)* | OpenAI key — used for embeddings only |
+| `ANTHROPIC_API_KEY` | *(required)* | Anthropic key — used for all LLM responses |
 | `QDRANT_HOST` | `localhost` | Qdrant hostname |
 | `QDRANT_PORT` | `6333` | Qdrant port |
 | `QDRANT_COLLECTION` | `scriptures` | Qdrant collection name |
 | `EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI embedding model |
-| `LLM_MODEL` | `gpt-4o` | OpenAI chat model |
+| `LLM_MODEL` | `claude-sonnet-4-6` | Anthropic Claude model ID |
+| `TOP_K_RESULTS` | `8` | Number of passages retrieved per query |
+| `ALLOWED_ORIGINS` | `http://localhost:3000` | CORS allowed origins (comma-separated) |

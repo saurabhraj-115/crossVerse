@@ -9,6 +9,7 @@ import {
   RELIGION_COLORS,
   RELIGION_EMOJI,
 } from '@/lib/types';
+import { useSettings } from '@/lib/settings-context';
 import VerseCard from '@/components/ui/VerseCard';
 import { Scale, Loader2, Search } from 'lucide-react';
 import clsx from 'clsx';
@@ -19,10 +20,9 @@ const QUICK_TOPICS = [
 ];
 
 export default function CompareView() {
+  const { globalReligions } = useSettings();
   const [topic, setTopic] = useState('');
-  const [selectedReligions, setSelectedReligions] = useState<Religion[]>([
-    'Christianity', 'Islam', 'Hinduism',
-  ]);
+  const [selectedReligions, setSelectedReligions] = useState<Religion[]>(globalReligions);
   const [result, setResult] = useState<CompareResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -163,7 +163,7 @@ export default function CompareView() {
           <div
             className="grid gap-6"
             style={{
-              gridTemplateColumns: `repeat(${Math.min(selectedReligions.length, 3)}, minmax(0, 1fr))`,
+              gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, 300px), 1fr))`,
             }}
           >
             {selectedReligions.map((religion) => {

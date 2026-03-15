@@ -9,6 +9,7 @@ import {
   RELIGION_COLORS,
   RELIGION_EMOJI,
 } from '@/lib/types';
+import { useSettings } from '@/lib/settings-context';
 import VerseCard from '@/components/ui/VerseCard';
 import { Swords, Loader2, Play } from 'lucide-react';
 import clsx from 'clsx';
@@ -22,10 +23,9 @@ const DEBATE_QUESTIONS = [
 ];
 
 export default function DebateView() {
+  const { globalReligions } = useSettings();
   const [question, setQuestion] = useState('');
-  const [selectedReligions, setSelectedReligions] = useState<Religion[]>([
-    'Christianity', 'Islam',
-  ]);
+  const [selectedReligions, setSelectedReligions] = useState<Religion[]>(globalReligions);
   const [result, setResult] = useState<DebateResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

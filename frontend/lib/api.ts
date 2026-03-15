@@ -9,6 +9,24 @@ import type {
   ContradictionResponse,
   TopicsResponse,
   ScriptureChunk,
+  SituationRequest,
+  SituationResponse,
+  FactCheckRequest,
+  FactCheckResponse,
+  EthicsRequest,
+  EthicsResponse,
+  DailyResponse,
+  FingerprintQuestionsResponse,
+  FingerprintAnalyzeRequest,
+  FingerprintAnalyzeResponse,
+  SimilarityVerseRequest,
+  SimilarityVerseResponse,
+  SimilarityGraphRequest,
+  SimilarityGraphResponse,
+  StudyRequest,
+  StudyResponse,
+  ArchaeologyRequest,
+  ArchaeologyResponse,
 } from './types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -78,4 +96,70 @@ export async function getTopics(): Promise<TopicsResponse> {
 export async function getVerse(religion: string, ref: string): Promise<{ chunk: ScriptureChunk | null; message: string }> {
   const encodedRef = encodeURIComponent(ref);
   return fetchAPI(`/verse/${encodeURIComponent(religion)}/${encodedRef}`);
+}
+
+export async function getSituationWisdom(request: SituationRequest): Promise<SituationResponse> {
+  return fetchAPI<SituationResponse>('/situations', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+export async function factCheck(request: FactCheckRequest): Promise<FactCheckResponse> {
+  return fetchAPI<FactCheckResponse>('/factcheck', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+export async function getEthicsPerspectives(request: EthicsRequest): Promise<EthicsResponse> {
+  return fetchAPI<EthicsResponse>('/ethics', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+export async function getDailyBriefing(fresh = false): Promise<DailyResponse> {
+  return fetchAPI<DailyResponse>(fresh ? '/daily?fresh=true' : '/daily');
+}
+
+export async function getFingerprintQuestions(): Promise<FingerprintQuestionsResponse> {
+  return fetchAPI<FingerprintQuestionsResponse>('/fingerprint/questions');
+}
+
+export async function analyzeSpiritualFingerprint(
+  request: FingerprintAnalyzeRequest
+): Promise<FingerprintAnalyzeResponse> {
+  return fetchAPI<FingerprintAnalyzeResponse>('/fingerprint/analyze', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+export async function findSimilarVerses(request: SimilarityVerseRequest): Promise<SimilarityVerseResponse> {
+  return fetchAPI<SimilarityVerseResponse>('/similarity/verse', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+export async function getSimilarityGraph(request: SimilarityGraphRequest): Promise<SimilarityGraphResponse> {
+  return fetchAPI<SimilarityGraphResponse>('/similarity/graph', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+export async function generateStudyPlan(request: StudyRequest): Promise<StudyResponse> {
+  return fetchAPI<StudyResponse>('/study', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+export async function archaeologyConcept(request: ArchaeologyRequest): Promise<ArchaeologyResponse> {
+  return fetchAPI<ArchaeologyResponse>('/archaeology', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
 }

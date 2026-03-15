@@ -1,5 +1,8 @@
 import Link from 'next/link';
-import { BookOpen, Scale, Swords, Compass, ArrowRight, Sparkles } from 'lucide-react';
+import {
+  BookOpen, Scale, Swords, Compass, ArrowRight, Sparkles,
+  Heart, CheckCircle2, Flame, Fingerprint, Network, Microscope, Calendar, GraduationCap,
+} from 'lucide-react';
 
 const QUICK_TOPICS = [
   { label: 'Love', emoji: '❤️' },
@@ -12,42 +15,108 @@ const QUICK_TOPICS = [
   { label: 'Forgiveness', emoji: '🕊️' },
 ];
 
-const FEATURES = [
+const CORE_FEATURES = [
   {
     icon: BookOpen,
     title: 'Ask the Scriptures',
-    description:
-      'Ask any question and receive answers grounded exclusively in sacred scripture — with every claim cited.',
+    description: 'Ask any question and receive answers grounded exclusively in sacred scripture — with every claim cited.',
     href: '/query',
-    color: 'text-indigo-600',
-    bg: 'bg-indigo-50',
+    color: 'text-indigo-600 dark:text-indigo-400',
+    bg: 'bg-indigo-50 dark:bg-indigo-900/30',
   },
   {
     icon: Scale,
     title: 'Compare Traditions',
-    description:
-      'See what Christianity, Islam, Hinduism, Buddhism, Judaism, and Sikhism each say about the same topic — side by side.',
+    description: 'See what all six traditions say about the same topic — side by side.',
     href: '/compare',
-    color: 'text-violet-600',
-    bg: 'bg-violet-50',
+    color: 'text-violet-600 dark:text-violet-400',
+    bg: 'bg-violet-50 dark:bg-violet-900/30',
   },
   {
     icon: Swords,
     title: 'Scripture Debate',
-    description:
-      "Pose a question and watch each tradition's scriptures respond independently, revealing agreements and tensions.",
+    description: "Pose a question and watch each tradition's scriptures respond independently.",
     href: '/debate',
-    color: 'text-rose-600',
-    bg: 'bg-rose-50',
+    color: 'text-rose-600 dark:text-rose-400',
+    bg: 'bg-rose-50 dark:bg-rose-900/30',
   },
   {
     icon: Compass,
     title: 'Topic Explorer',
-    description:
-      'Browse curated topics across universal themes, ethics, society, and spirituality. Find connections you never expected.',
+    description: 'Browse curated topics across universal themes, ethics, society, and spirituality.',
     href: '/explore',
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
+    color: 'text-emerald-600 dark:text-emerald-400',
+    bg: 'bg-emerald-50 dark:bg-emerald-900/30',
+  },
+];
+
+const EXPLORE_FEATURES = [
+  {
+    icon: Network,
+    title: 'Similarity Graph',
+    description: 'Visualize how verses from different traditions cluster around the same concept using a force-directed graph.',
+    href: '/graph',
+    color: 'text-blue-600 dark:text-blue-400',
+    bg: 'bg-blue-50 dark:bg-blue-900/30',
+  },
+  {
+    icon: Microscope,
+    title: 'Concept Archaeology',
+    description: 'Trace the lineage of an idea across all traditions — shared roots, parallel developments, and differences.',
+    href: '/archaeology',
+    color: 'text-stone-600 dark:text-stone-400',
+    bg: 'bg-stone-50 dark:bg-stone-900/30',
+  },
+  {
+    icon: Calendar,
+    title: 'Daily Briefing',
+    description: "A new theme every day, with reflections from all six traditions. Start your morning with scripture.",
+    href: '/daily',
+    color: 'text-amber-600 dark:text-amber-400',
+    bg: 'bg-amber-50 dark:bg-amber-900/30',
+  },
+];
+
+const TOOLS_FEATURES = [
+  {
+    icon: Heart,
+    title: 'Life Situations',
+    description: 'Describe what you\'re going through. Receive honest, human wisdom from scripture — not preachy.',
+    href: '/situations',
+    color: 'text-rose-600 dark:text-rose-400',
+    bg: 'bg-rose-50 dark:bg-rose-900/30',
+  },
+  {
+    icon: CheckCircle2,
+    title: 'Fact Check',
+    description: 'Verify whether a claim is supported, contradicted, or not addressed by a tradition\'s scripture.',
+    href: '/factcheck',
+    color: 'text-green-600 dark:text-green-400',
+    bg: 'bg-green-50 dark:bg-green-900/30',
+  },
+  {
+    icon: Flame,
+    title: 'Ethical Dilemmas',
+    description: 'See how each tradition reasons through hard moral questions — in parallel, from scripture.',
+    href: '/ethics',
+    color: 'text-orange-600 dark:text-orange-400',
+    bg: 'bg-orange-50 dark:bg-orange-900/30',
+  },
+  {
+    icon: Fingerprint,
+    title: 'Spiritual Fingerprint',
+    description: '10 questions to discover which tradition\'s worldview most aligns with yours.',
+    href: '/fingerprint',
+    color: 'text-violet-600 dark:text-violet-400',
+    bg: 'bg-violet-50 dark:bg-violet-900/30',
+  },
+  {
+    icon: GraduationCap,
+    title: 'Study Plans',
+    description: 'Generate a structured multi-day curriculum comparing all traditions on any topic.',
+    href: '/study',
+    color: 'text-teal-600 dark:text-teal-400',
+    bg: 'bg-teal-50 dark:bg-teal-900/30',
   },
 ];
 
@@ -60,12 +129,36 @@ const TRADITIONS = [
   { name: 'Sikhism', emoji: '🪯', text: 'Guru Granth Sahib', color: '#14B8A6' },
 ];
 
+function FeatureCard({ icon: Icon, title, description, href, color, bg }: {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  href: string;
+  color: string;
+  bg: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
+    >
+      <div className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl ${bg} ${color}`}>
+        <Icon size={22} />
+      </div>
+      <h3 className="mb-2 font-bold text-gray-900 dark:text-gray-100">{title}</h3>
+      <p className="text-sm text-gray-500 leading-relaxed dark:text-gray-400">{description}</p>
+      <div className={`mt-4 flex items-center gap-1 text-sm font-medium ${color} opacity-0 group-hover:opacity-100 transition-opacity`}>
+        Explore <ArrowRight size={14} />
+      </div>
+    </Link>
+  );
+}
+
 export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-b from-indigo-950 via-indigo-900 to-indigo-800 px-4 py-24 text-center text-white">
-        {/* Decorative orbs */}
         <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-violet-600/20 blur-3xl" />
         <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-indigo-400/20 blur-3xl" />
 
@@ -89,7 +182,6 @@ export default function HomePage() {
             always cited.
           </p>
 
-          {/* CTA buttons */}
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/query"
@@ -98,10 +190,10 @@ export default function HomePage() {
               Ask a Question <ArrowRight size={18} />
             </Link>
             <Link
-              href="/compare"
+              href="/fingerprint"
               className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-6 py-3 font-semibold text-white hover:bg-white/20 transition-colors backdrop-blur-sm"
             >
-              Compare Traditions
+              Find Your Tradition
             </Link>
           </div>
         </div>
@@ -127,32 +219,47 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* Core Features */}
       <section className="px-4 py-16">
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-3 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
-            Four ways to explore scripture
+          <h2 className="mb-2 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Core Tools
           </h2>
           <p className="mb-10 text-center text-gray-500 dark:text-gray-400">
             From quick answers to deep cross-tradition analysis
           </p>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map(({ icon: Icon, title, description, href, color, bg }) => (
-              <Link
-                key={href}
-                href={href}
-                className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 dark:border-gray-700 dark:bg-gray-900 dark:hover:shadow-none dark:hover:border-gray-600"
-              >
-                <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl ${bg} ${color} dark:bg-opacity-20`}>
-                  <Icon size={24} />
-                </div>
-                <h3 className="mb-2 font-bold text-gray-900 dark:text-gray-100">{title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed dark:text-gray-400">{description}</p>
-                <div className={`mt-4 flex items-center gap-1 text-sm font-medium ${color} opacity-0 group-hover:opacity-100 transition-opacity`}>
-                  Explore <ArrowRight size={14} />
-                </div>
-              </Link>
-            ))}
+            {CORE_FEATURES.map((f) => <FeatureCard key={f.href} {...f} />)}
+          </div>
+        </div>
+      </section>
+
+      {/* Explore Features */}
+      <section className="bg-gray-50 px-4 py-16 dark:bg-gray-950">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-2 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Explore
+          </h2>
+          <p className="mb-10 text-center text-gray-500 dark:text-gray-400">
+            Visualize connections, trace ideas through history, and start each day with wisdom
+          </p>
+          <div className="grid gap-6 sm:grid-cols-3">
+            {EXPLORE_FEATURES.map((f) => <FeatureCard key={f.href} {...f} />)}
+          </div>
+        </div>
+      </section>
+
+      {/* Tools Features */}
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-2 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Tools
+          </h2>
+          <p className="mb-10 text-center text-gray-500 dark:text-gray-400">
+            Practical applications for scripture in your life
+          </p>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {TOOLS_FEATURES.map((f) => <FeatureCard key={f.href} {...f} />)}
           </div>
         </div>
       </section>
@@ -180,10 +287,7 @@ export default function HomePage() {
                   <div className="font-bold text-white">{name}</div>
                   <div className="text-sm text-gray-400">{text}</div>
                 </div>
-                <div
-                  className="ml-auto h-2 w-2 rounded-full"
-                  style={{ backgroundColor: color }}
-                />
+                <div className="ml-auto h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
               </div>
             ))}
           </div>
@@ -218,13 +322,21 @@ export default function HomePage() {
         <h2 className="mb-3 text-2xl font-bold text-gray-900 dark:text-gray-100">
           Ready to explore?
         </h2>
-        <p className="mb-6 text-gray-500 dark:text-gray-400">Start with a question, a comparison, or a debate.</p>
-        <Link
-          href="/query"
-          className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-8 py-3 font-semibold text-white hover:bg-indigo-700 transition-colors shadow-lg"
-        >
-          Get Started <ArrowRight size={18} />
-        </Link>
+        <p className="mb-6 text-gray-500 dark:text-gray-400">Start with a question, a comparison, or discover your tradition.</p>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Link
+            href="/query"
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-8 py-3 font-semibold text-white hover:bg-indigo-700 transition-colors shadow-lg"
+          >
+            Get Started <ArrowRight size={18} />
+          </Link>
+          <Link
+            href="/daily"
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-8 py-3 font-semibold text-gray-700 hover:bg-gray-50 transition-colors dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          >
+            Today&apos;s Briefing
+          </Link>
+        </div>
       </section>
     </div>
   );

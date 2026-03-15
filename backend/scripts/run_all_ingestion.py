@@ -17,10 +17,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.ingest_bible import ingest_bible
 from scripts.ingest_quran import ingest_quran
-from scripts.ingest_gita import ingest_gita
-from scripts.ingest_dhammapada import ingest_dhammapada
-from scripts.ingest_guru_granth import ingest_guru_granth
-from scripts.ingest_torah import ingest_torah
+from scripts.ingest_gita_full import ingest_gita_full
+from scripts.ingest_dhammapada_full import ingest_dhammapada_full
+from scripts.ingest_yoga_sutras_full import ingest_yoga_sutras_full
+from scripts.ingest_guru_granth_full import ingest_guru_granth_full
+from scripts.ingest_tanakh_full import ingest_tanakh_full
+from scripts.ingest_hadith_full import ingest_hadith_full
+from scripts.ingest_upanishads_full import ingest_upanishads_full
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,12 +32,21 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 INGESTION_STEPS = [
-    ("Bhagavad Gita (Hinduism)", ingest_gita),
-    ("Dhammapada (Buddhism)", ingest_dhammapada),
-    ("Guru Granth Sahib (Sikhism)", ingest_guru_granth),
-    ("Quran (Islam)", ingest_quran),
-    ("Bible KJV (Christianity)", ingest_bible),
-    ("Torah/Tanakh (Judaism)", ingest_torah),
+    # Hinduism
+    ("Bhagavad Gita – full 700 verses", ingest_gita_full),
+    ("Yoga Sutras – full 196 sutras", ingest_yoga_sutras_full),
+    ("Upanishads – 12 principal", ingest_upanishads_full),
+    # Buddhism
+    ("Dhammapada – full 423 verses", ingest_dhammapada_full),
+    # Sikhism
+    ("Guru Granth Sahib – full 1430 angs", ingest_guru_granth_full),
+    # Islam
+    ("Quran – complete", ingest_quran),
+    ("Hadith – Sahih Bukhari", ingest_hadith_full),
+    # Christianity
+    ("Bible KJV – complete", ingest_bible),
+    # Judaism
+    ("Tanakh – full 39 books", ingest_tanakh_full),
 ]
 
 

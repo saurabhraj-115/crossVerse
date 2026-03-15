@@ -24,6 +24,7 @@ async def ask_question(request: QueryRequest) -> QueryResponse:
             religions=request.religions,
             mode=request.mode,
             history=history,
+            language=request.language,
         )
     except Exception as exc:
         logger.exception("Error in /query: %s", exc)

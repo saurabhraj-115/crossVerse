@@ -17,24 +17,37 @@ from app.services.scripture import build_context_block, payload_to_chunk
 logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = (
-    "You are CrossVerse, an impartial religious-text scholar. "
-    "Your ONLY job is to explain what the provided scripture passages say about the question. "
-    "Rules you MUST follow:\n"
-    "1. Answer ONLY using the numbered passages supplied in the context block — do not draw on outside knowledge.\n"
-    "2. ALWAYS cite every claim with its reference number, e.g. [1], [3].\n"
-    "3. NEVER add personal opinion, modern commentary, or theological judgement.\n"
-    "4. If the passages do not address the question, say so explicitly.\n"
-    "5. In Scholar mode: give detailed verse-by-verse analysis. In Simple mode: give a concise plain-English summary.\n"
+    "You are CrossVerse — a sacred scripture guide, not a general-purpose AI assistant.\n\n"
+
+    "YOUR ONLY SOURCE OF TRUTH: The numbered scripture passages provided in the context block below. "
+    "You have no other knowledge. You do not know anything outside those passages.\n\n"
+
+    "HARD RULES — violating any of these is a critical failure:\n"
+    "1. NEVER answer from general knowledge, memory, or reasoning not grounded in the provided passages.\n"
+    "2. ALWAYS cite every single claim with its passage number, e.g. [1], [3]. No citation = do not say it.\n"
+    "3. NEVER give advice, opinions, therapy, life coaching, or modern commentary.\n"
+    "4. NEVER answer questions unrelated to human experience, ethics, spirituality, or life guidance "
+    "(e.g. coding, math, trivia). Instead, respond: "
+    "'CrossVerse only speaks through scripture. Try asking about a life situation, a moral question, "
+    "or a theme like forgiveness, loss, purpose, or fear — and the texts will answer.'\n"
+    "5. If the retrieved passages genuinely do not address the question, say so plainly: "
+    "'The retrieved passages do not directly address this. Try rephrasing or broadening your question.'\n"
+    "6. Do NOT pad, flatter, or add filler. Be direct. Let the scripture speak.\n\n"
+
+    "TONE: You speak like a learned, compassionate scholar who deeply respects all traditions equally. "
+    "You do not preach. You illuminate what the texts say and let the reader decide.\n"
 )
 
 SCHOLAR_SUFFIX = "\n\nMode: Scholar — provide detailed analysis with verse-by-verse breakdown."
 SIMPLE_SUFFIX = "\n\nMode: Simple — provide a brief, plain-English summary (3-5 sentences)."
+CHILD_SUFFIX = "\n\nMode: Child — explain in simple words a 10-year-old would understand. Short sentences. No jargon."
 
 
 async def _search_qdrant(
     vector: List[float],
     religions: Optional[List[str]],
     top_k: int,
+    offset: int = 0,
 ) -> List[ScriptureChunk]:
     settings = get_settings()
     client = get_qdrant()
@@ -55,6 +68,7 @@ async def _search_qdrant(
         collection_name=settings.qdrant_collection,
         query_vector=vector,
         query_filter=query_filter,
+        offset=offset,
         limit=top_k,
         with_payload=True,
     )
@@ -71,6 +85,7 @@ async def query_scriptures(
     religions: Optional[List[str]] = None,
     mode: str = "simple",
     history: Optional[List[Dict]] = None,
+    language: Optional[str] = None,
 ) -> QueryResponse:
     """Full RAG pipeline: embed -> search -> generate."""
     settings = get_settings()
@@ -90,7 +105,15 @@ async def query_scriptures(
 
     # 3. Build context and prompt
     context = build_context_block(chunks)
-    mode_suffix = SCHOLAR_SUFFIX if mode == "scholar" else SIMPLE_SUFFIX
+    if mode == "scholar":
+        mode_suffix = SCHOLAR_SUFFIX
+    elif mode == "child":
+        mode_suffix = CHILD_SUFFIX
+    else:
+        mode_suffix = SIMPLE_SUFFIX
+
+    if language and language.lower() not in ("english", "en"):
+        mode_suffix += f"\n\nLanguage: Respond entirely in {language}."
 
     user_message = (
         f"Scripture passages:\n\n{context}\n\n"
