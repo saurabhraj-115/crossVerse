@@ -22,6 +22,30 @@ const QUICK_QUESTIONS = [
   'How should we approach prayer?',
 ];
 
+// Auto-detect religion mentions in a question
+const RELIGION_KEYWORDS: Record<string, Religion> = {
+  christian: 'Christianity', christianity: 'Christianity', bible: 'Christianity',
+  jesus: 'Christianity', christ: 'Christianity', gospel: 'Christianity',
+  islam: 'Islam', muslim: 'Islam', quran: 'Islam', islamic: 'Islam',
+  allah: 'Islam', muhammad: 'Islam', prophet: 'Islam',
+  hindu: 'Hinduism', hinduism: 'Hinduism', gita: 'Hinduism',
+  vedic: 'Hinduism', krishna: 'Hinduism', upanishad: 'Hinduism', vedanta: 'Hinduism',
+  buddhism: 'Buddhism', buddhist: 'Buddhism', buddha: 'Buddhism',
+  dhamma: 'Buddhism', dharma: 'Buddhism', pali: 'Buddhism',
+  jewish: 'Judaism', judaism: 'Judaism', torah: 'Judaism',
+  hebrew: 'Judaism', talmud: 'Judaism', rabbi: 'Judaism',
+  sikh: 'Sikhism', sikhism: 'Sikhism', granth: 'Sikhism', guru: 'Sikhism',
+};
+
+function detectReligions(text: string): Religion[] {
+  const lower = text.toLowerCase();
+  const detected = new Set<Religion>();
+  for (const [keyword, religion] of Object.entries(RELIGION_KEYWORDS)) {
+    if (lower.includes(keyword)) detected.add(religion);
+  }
+  return Array.from(detected);
+}
+
 export default function QueryChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -47,6 +71,12 @@ export default function QueryChat() {
   const sendMessage = async (text: string) => {
     if (!text.trim() || loading) return;
 
+    // Auto-detect religions if none are manually selected
+    const autoDetected = selectedReligions.length === 0 ? detectReligions(text) : [];
+    const religionsToUse =
+      selectedReligions.length > 0 ? selectedReligions :
+      autoDetected.length > 0 ? autoDetected : null;
+
     const userMessage: ChatMessage = {
       role: 'user',
       content: text.trim(),
@@ -59,7 +89,6 @@ export default function QueryChat() {
     setError(null);
 
     try {
-      // Build history from existing messages (exclude the one we just added)
       const history: HistoryMessage[] = messages.map((m) => ({
         role: m.role,
         content: m.content,
@@ -67,7 +96,7 @@ export default function QueryChat() {
 
       const response = await queryScriptures({
         question: text.trim(),
-        religions: selectedReligions.length > 0 ? selectedReligions : null,
+        religions: religionsToUse,
         mode,
         history: history.length > 0 ? history : null,
       });
@@ -99,9 +128,10 @@ export default function QueryChat() {
     }
   };
 
-  const toggleVoice = () => {
+  const toggleVoice = async () => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
     if (!SpeechRecognition) {
       setError('Voice input is not supported in this browser. Try Chrome or Edge.');
       return;
@@ -113,15 +143,36 @@ export default function QueryChat() {
       return;
     }
 
+    // Request mic permission explicitly first — this surfaces the browser prompt
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((t) => t.stop()); // release immediately; recognition takes over
+    } catch {
+      setError('Microphone access denied. Please allow microphone access in your browser settings.');
+      return;
+    }
+
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.interimResults = true;
     recognition.continuous = false;
     recognitionRef.current = recognition;
 
-    recognition.onstart = () => setListening(true);
+    recognition.onstart = () => {
+      setListening(true);
+      setError(null);
+    };
     recognition.onend = () => setListening(false);
-    recognition.onerror = () => setListening(false);
+    recognition.onerror = (event: any) => {
+      setListening(false);
+      if (event.error === 'not-allowed') {
+        setError('Microphone access denied. Allow it in browser settings and try again.');
+      } else if (event.error === 'no-speech') {
+        setError('No speech detected. Try speaking louder or closer to the mic.');
+      } else {
+        setError(`Voice input error: ${event.error}`);
+      }
+    };
 
     recognition.onresult = (event: any) => {
       const transcript = Array.from(event.results as any[])
