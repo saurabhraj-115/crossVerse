@@ -92,17 +92,17 @@ export default function QueryChat() {
   return (
     <div className="flex h-full flex-col">
       {/* Controls bar */}
-      <div className="border-b border-gray-200 bg-white px-4 py-3">
+      <div className="border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-4">
           {/* Mode toggle */}
-          <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-1">
+          <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
             <button
               onClick={() => setMode('simple')}
               className={clsx(
                 'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
                 mode === 'simple'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-gray-100'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
               )}
             >
               <MessageCircle size={13} />
@@ -113,8 +113,8 @@ export default function QueryChat() {
               className={clsx(
                 'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
                 mode === 'scholar'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-gray-100'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
               )}
             >
               <GraduationCap size={13} />
@@ -131,8 +131,8 @@ export default function QueryChat() {
                 className={clsx(
                   'rounded-full border px-2 py-0.5 text-xs font-medium transition-colors',
                   selectedReligions.includes(religion)
-                    ? 'border-indigo-400 bg-indigo-50 text-indigo-700'
-                    : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
+                    ? 'border-indigo-400 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 dark:border-indigo-600'
+                    : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-600'
                 )}
               >
                 {RELIGION_EMOJI[religion]} {religion}
@@ -148,10 +148,10 @@ export default function QueryChat() {
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="mb-4 text-4xl">📖</div>
-              <h2 className="mb-2 text-xl font-bold text-gray-800">
+              <h2 className="mb-2 text-xl font-bold text-gray-800 dark:text-gray-200">
                 Ask the Scriptures
               </h2>
-              <p className="mb-6 max-w-md text-sm text-gray-500">
+              <p className="mb-6 max-w-md text-sm text-gray-500 dark:text-gray-400">
                 Ask any question and receive answers grounded exclusively in sacred
                 scripture from across traditions. All citations included.
               </p>
@@ -160,7 +160,7 @@ export default function QueryChat() {
                   <button
                     key={q}
                     onClick={() => sendMessage(q)}
-                    className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
+                    className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
                   >
                     {q}
                   </button>
@@ -178,7 +178,7 @@ export default function QueryChat() {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white">
                 <Loader2 size={16} className="animate-spin" />
               </div>
-              <div className="rounded-2xl bg-gray-50 border border-gray-200 px-4 py-3">
+              <div className="rounded-2xl bg-gray-50 border border-gray-200 px-4 py-3 dark:bg-gray-800 dark:border-gray-700">
                 <div className="flex gap-1">
                   <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.3s]" />
                   <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.15s]" />
@@ -189,7 +189,7 @@ export default function QueryChat() {
           )}
 
           {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-900/20 dark:text-red-400">
               {error}
             </div>
           )}
@@ -199,9 +199,9 @@ export default function QueryChat() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-gray-200 bg-white px-4 py-4">
+      <div className="border-t border-gray-200 bg-white px-4 py-4 dark:border-gray-800 dark:bg-gray-900">
         <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
-          <div className="flex items-end gap-3 rounded-xl border border-gray-300 bg-white p-2 shadow-sm focus-within:border-indigo-400 focus-within:ring-1 focus-within:ring-indigo-400 transition-all">
+          <div className="flex items-end gap-3 rounded-xl border border-gray-300 bg-white p-2 shadow-sm focus-within:border-indigo-400 focus-within:ring-1 focus-within:ring-indigo-400 transition-all dark:border-gray-700 dark:bg-gray-800 dark:focus-within:border-indigo-500 dark:focus-within:ring-indigo-500">
             <textarea
               ref={inputRef}
               value={input}
@@ -209,7 +209,7 @@ export default function QueryChat() {
               onKeyDown={handleKeyDown}
               placeholder="Ask a question about scripture… (Enter to send, Shift+Enter for new line)"
               rows={1}
-              className="flex-1 resize-none bg-transparent px-2 py-1 text-sm text-gray-900 placeholder-gray-400 outline-none"
+              className="flex-1 resize-none bg-transparent px-2 py-1 text-sm text-gray-900 placeholder-gray-400 outline-none dark:text-gray-100 dark:placeholder-gray-500"
               style={{ maxHeight: '120px' }}
               disabled={loading}
             />
@@ -221,7 +221,7 @@ export default function QueryChat() {
               <Send size={15} />
             </button>
           </div>
-          <p className="mt-2 text-center text-xs text-gray-400">
+          <p className="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">
             Answers are grounded exclusively in scripture. Always cite primary sources.
           </p>
         </form>

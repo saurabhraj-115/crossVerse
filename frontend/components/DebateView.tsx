@@ -57,19 +57,19 @@ export default function DebateView() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       {/* Header */}
       <div className="mb-8 text-center">
-        <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-600">
+        <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
           <Swords size={24} />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900">Scripture Debate</h1>
-        <p className="mt-2 text-gray-500">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Scripture Debate</h1>
+        <p className="mt-2 text-gray-500 dark:text-gray-400">
           Each tradition&apos;s scriptures respond to the same question. No commentary — only text.
         </p>
       </div>
 
       {/* Controls */}
-      <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
         <div className="mb-5">
-          <label className="mb-1.5 block text-sm font-semibold text-gray-700">Question</label>
+          <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">Question</label>
           <div className="flex gap-2">
             <input
               type="text"
@@ -77,7 +77,7 @@ export default function DebateView() {
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleDebate()}
               placeholder="Pose a question for the traditions to answer…"
-              className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400"
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-rose-500"
             />
             <button
               onClick={() => handleDebate()}
@@ -97,7 +97,7 @@ export default function DebateView() {
                   setQuestion(q);
                   handleDebate(q);
                 }}
-                className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs text-gray-600 hover:border-rose-300 hover:text-rose-600 transition-colors"
+                className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs text-gray-600 hover:border-rose-300 hover:text-rose-600 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-rose-700 dark:hover:text-rose-400"
               >
                 {q}
               </button>
@@ -106,9 +106,9 @@ export default function DebateView() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+          <label className="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">
             Debating traditions{' '}
-            <span className="font-normal text-gray-400">(select 2+)</span>
+            <span className="font-normal text-gray-400 dark:text-gray-500">(select 2+)</span>
           </label>
           <div className="flex flex-wrap gap-2">
             {ALL_RELIGIONS.map((religion) => {
@@ -120,7 +120,9 @@ export default function DebateView() {
                   onClick={() => toggleReligion(religion)}
                   className={clsx(
                     'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all',
-                    selected ? 'border-current text-white shadow-sm' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    selected
+                      ? 'border-current text-white shadow-sm'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-600'
                   )}
                   style={selected ? { backgroundColor: color, borderColor: color } : {}}
                 >
@@ -133,13 +135,13 @@ export default function DebateView() {
       </div>
 
       {error && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-900/20 dark:text-red-400">
           {error}
         </div>
       )}
 
       {loading && (
-        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500 dark:text-gray-400">
           <Loader2 size={24} className="animate-spin text-rose-500" />
           <span>Consulting {selectedReligions.length} traditions…</span>
         </div>
@@ -148,10 +150,10 @@ export default function DebateView() {
       {result && !loading && (
         <div className="space-y-8">
           <div className="text-center">
-            <h2 className="text-xl font-bold text-gray-800">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
               &ldquo;{result.question}&rdquo;
             </h2>
-            <p className="mt-1 text-sm text-gray-500">Each tradition speaks for itself</p>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Each tradition speaks for itself</p>
           </div>
 
           <div className="space-y-6">
@@ -161,7 +163,7 @@ export default function DebateView() {
               if (!response) return null;
 
               return (
-                <div key={religion} className="rounded-2xl border bg-white shadow-sm overflow-hidden">
+                <div key={religion} className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden dark:border-gray-700 dark:bg-gray-900">
                   {/* Religion header */}
                   <div
                     className="px-6 py-4 text-white"
@@ -183,8 +185,8 @@ export default function DebateView() {
 
                   <div className="px-6 py-5">
                     {/* Answer */}
-                    <div className="mb-5 rounded-xl bg-gray-50 p-4">
-                      <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap">
+                    <div className="mb-5 rounded-xl bg-gray-50 p-4 dark:bg-gray-800">
+                      <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap dark:text-gray-300">
                         {response.answer}
                       </p>
                     </div>
@@ -192,7 +194,7 @@ export default function DebateView() {
                     {/* Source verses */}
                     {response.sources.length > 0 && (
                       <div>
-                        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                           Supporting Passages
                         </p>
                         <div className="grid gap-3 sm:grid-cols-2">

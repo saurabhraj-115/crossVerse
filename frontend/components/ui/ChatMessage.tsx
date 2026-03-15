@@ -36,10 +36,9 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             'rounded-2xl px-4 py-3 text-sm leading-relaxed',
             isUser
               ? 'bg-indigo-600 text-white rounded-tr-sm'
-              : 'bg-gray-50 border border-gray-200 text-gray-800 rounded-tl-sm'
+              : 'bg-gray-50 border border-gray-200 text-gray-800 rounded-tl-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200'
           )}
         >
-          {/* Render answer with citation markers bolded */}
           <p className="whitespace-pre-wrap">
             {isUser
               ? message.content
@@ -50,7 +49,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         {/* Sources */}
         {!isUser && message.sources && message.sources.length > 0 && (
           <div className="w-full space-y-2">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide dark:text-gray-400">
               Sources ({message.sources.length})
             </p>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -61,7 +60,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </div>
         )}
 
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-gray-400 dark:text-gray-500">
           {message.timestamp.toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit',
@@ -73,12 +72,11 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 }
 
 function formatAnswerWithCitations(text: string): React.ReactNode {
-  // Bold citation markers like [1], [2,3], etc.
   const parts = text.split(/(\[\d+(?:,\s*\d+)*\])/g);
   return parts.map((part, i) => {
     if (/^\[\d+(?:,\s*\d+)*\]$/.test(part)) {
       return (
-        <strong key={i} className="font-bold text-indigo-700">
+        <strong key={i} className="font-bold text-indigo-700 dark:text-indigo-400">
           {part}
         </strong>
       );
