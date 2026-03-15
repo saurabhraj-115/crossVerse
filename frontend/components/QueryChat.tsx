@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { queryScriptures } from '@/lib/api';
 import {
   type ChatMessage,
+  type HistoryMessage,
   type Religion,
   type QueryMode,
   ALL_RELIGIONS,
@@ -56,10 +57,17 @@ export default function QueryChat() {
     setError(null);
 
     try {
+      // Build history from existing messages (exclude the one we just added)
+      const history: HistoryMessage[] = messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
       const response = await queryScriptures({
         question: text.trim(),
         religions: selectedReligions.length > 0 ? selectedReligions : null,
         mode,
+        history: history.length > 0 ? history : null,
       });
 
       const assistantMessage: ChatMessage = {

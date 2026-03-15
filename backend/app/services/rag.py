@@ -70,6 +70,7 @@ async def query_scriptures(
     question: str,
     religions: Optional[List[str]] = None,
     mode: str = "simple",
+    history: Optional[List[Dict]] = None,
 ) -> QueryResponse:
     """Full RAG pipeline: embed -> search -> generate."""
     settings = get_settings()
@@ -97,12 +98,14 @@ async def query_scriptures(
         f"{mode_suffix}"
     )
 
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": user_message},
-    ]
+    # 4. Build message list with optional conversation history
+    messages: List[Dict] = [{"role": "system", "content": SYSTEM_PROMPT}]
+    if history:
+        for turn in history[-10:]:  # cap at last 10 turns to avoid token overflow
+            messages.append({"role": turn["role"], "content": turn["content"]})
+    messages.append({"role": "user", "content": user_message})
 
-    # 4. Generate answer
+    # 5. Generate answer
     answer = await chat_complete(messages, temperature=0.2)
 
     return QueryResponse(

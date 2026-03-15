@@ -57,10 +57,16 @@ export const RELIGION_EMOJI: Record<Religion, string> = {
 
 export type QueryMode = 'simple' | 'scholar';
 
+export interface HistoryMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export interface QueryRequest {
   question: string;
   religions?: Religion[] | null;
   mode: QueryMode;
+  history?: HistoryMessage[] | null;
 }
 
 export interface QueryResponse {

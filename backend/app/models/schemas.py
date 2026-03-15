@@ -25,6 +25,11 @@ class ScriptureChunk(BaseModel):
 # Query
 # ---------------------------------------------------------------------------
 
+class HistoryMessage(BaseModel):
+    role: str  # "user" | "assistant"
+    content: str
+
+
 class QueryRequest(BaseModel):
     question: str = Field(..., min_length=3, max_length=1000)
     religions: Optional[List[str]] = Field(
@@ -32,6 +37,10 @@ class QueryRequest(BaseModel):
         description="Filter results by religion. None means all religions.",
     )
     mode: str = Field(default="simple", pattern="^(simple|scholar)$")
+    history: Optional[List[HistoryMessage]] = Field(
+        default=None,
+        description="Previous conversation turns for multi-turn context.",
+    )
 
 
 class QueryResponse(BaseModel):
