@@ -55,7 +55,7 @@ export const RELIGION_EMOJI: Record<Religion, string> = {
   Sikhism: '🪯',
 };
 
-export type QueryMode = 'simple' | 'scholar';
+export type QueryMode = 'simple' | 'scholar' | 'child';
 
 export interface HistoryMessage {
   role: 'user' | 'assistant';
@@ -67,6 +67,7 @@ export interface QueryRequest {
   religions?: Religion[] | null;
   mode: QueryMode;
   history?: HistoryMessage[] | null;
+  language?: string | null;
 }
 
 export interface QueryResponse {
@@ -126,4 +127,166 @@ export interface ChatMessage {
   content: string;
   sources?: ScriptureChunk[];
   timestamp: Date;
+}
+
+// ---------------------------------------------------------------------------
+// Situations
+// ---------------------------------------------------------------------------
+export interface SituationRequest {
+  situation: string;
+  religions?: Religion[] | null;
+}
+
+export interface SituationResponse {
+  wisdom: string;
+  sources: ScriptureChunk[];
+  situation: string;
+}
+
+// ---------------------------------------------------------------------------
+// Fact-check
+// ---------------------------------------------------------------------------
+export interface FactCheckRequest {
+  claim: string;
+  religion: Religion;
+}
+
+export type FactCheckVerdict = 'supported' | 'contradicted' | 'not_found' | 'nuanced';
+
+export interface FactCheckResponse {
+  claim: string;
+  religion: Religion;
+  verdict: FactCheckVerdict;
+  explanation: string;
+  sources: ScriptureChunk[];
+}
+
+// ---------------------------------------------------------------------------
+// Ethics
+// ---------------------------------------------------------------------------
+export interface EthicsRequest {
+  dilemma: string;
+  religions?: Religion[] | null;
+}
+
+export interface EthicsResponse {
+  dilemma: string;
+  perspectives: Record<Religion, string>;
+  sources: Record<Religion, ScriptureChunk[]>;
+}
+
+// ---------------------------------------------------------------------------
+// Daily
+// ---------------------------------------------------------------------------
+export interface DailyPerspective {
+  reflection: string;
+  sources: ScriptureChunk[];
+}
+
+export interface DailyResponse {
+  theme: string;
+  date: string;
+  perspectives: Record<Religion, DailyPerspective>;
+}
+
+// ---------------------------------------------------------------------------
+// Fingerprint
+// ---------------------------------------------------------------------------
+export interface FingerprintQuestion {
+  id: number;
+  question: string;
+  options: string[];
+}
+
+export interface FingerprintQuestionsResponse {
+  questions: FingerprintQuestion[];
+}
+
+export interface FingerprintAnswer {
+  question_id: number;
+  answer: string;
+}
+
+export interface FingerprintAnalyzeRequest {
+  answers: FingerprintAnswer[];
+}
+
+export interface FingerprintAnalyzeResponse {
+  primary_tradition: Religion;
+  scores: Record<Religion, number>;
+  explanation: string;
+  key_verses: ScriptureChunk[];
+}
+
+// ---------------------------------------------------------------------------
+// Similarity graph
+// ---------------------------------------------------------------------------
+export interface SimilarityVerseRequest {
+  reference: string;
+  religion: Religion;
+  top_k?: number;
+}
+
+export interface SimilarityVerseResponse {
+  reference: string;
+  religion: Religion;
+  similar_verses: ScriptureChunk[];
+}
+
+export interface GraphNode {
+  id: string;
+  religion: Religion;
+  reference: string;
+  text: string;
+  score: number;
+}
+
+export interface GraphEdge {
+  source: string;
+  target: string;
+  similarity: number;
+}
+
+export interface SimilarityGraphRequest {
+  concept: string;
+  religions?: Religion[] | null;
+}
+
+export interface SimilarityGraphResponse {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+}
+
+// ---------------------------------------------------------------------------
+// Study plan
+// ---------------------------------------------------------------------------
+export interface StudyRequest {
+  topic: string;
+  days?: number;
+  religions?: Religion[] | null;
+}
+
+export interface StudyDay {
+  day: number;
+  theme: string;
+  verses: ScriptureChunk[];
+  reflection_prompt: string;
+}
+
+export interface StudyResponse {
+  topic: string;
+  days: StudyDay[];
+}
+
+// ---------------------------------------------------------------------------
+// Archaeology
+// ---------------------------------------------------------------------------
+export interface ArchaeologyRequest {
+  concept: string;
+}
+
+export interface ArchaeologyResponse {
+  concept: string;
+  analysis: string;
+  sources: ScriptureChunk[];
 }

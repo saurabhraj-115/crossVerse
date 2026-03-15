@@ -10,16 +10,60 @@ import {
   ALL_RELIGIONS,
   RELIGION_EMOJI,
 } from '@/lib/types';
+import { useSettings } from '@/lib/settings-context';
 import ChatMessageComponent from '@/components/ui/ChatMessage';
-import { Send, Loader2, GraduationCap, MessageCircle, Mic, MicOff } from 'lucide-react';
+import { Send, Loader2, GraduationCap, MessageCircle, Mic, MicOff, Baby, Globe } from 'lucide-react';
 import clsx from 'clsx';
 
-const QUICK_QUESTIONS = [
-  'What is the nature of the soul?',
-  'How should we treat our enemies?',
-  'What happens after death?',
-  'What does scripture say about forgiveness?',
-  'How should we approach prayer?',
+const PROMPT_CATEGORIES = [
+  {
+    label: 'Life moments',
+    color: 'text-rose-600 dark:text-rose-400',
+    border: 'border-rose-200 dark:border-rose-800',
+    bg: 'hover:bg-rose-50 dark:hover:bg-rose-900/20',
+    prompts: [
+      'I just lost someone I love',
+      "I feel completely lost and don't know my purpose",
+      'I failed at something I deeply cared about',
+      'I feel alone even when surrounded by people',
+    ],
+  },
+  {
+    label: 'Inner struggles',
+    color: 'text-amber-600 dark:text-amber-400',
+    border: 'border-amber-200 dark:border-amber-800',
+    bg: 'hover:bg-amber-50 dark:hover:bg-amber-900/20',
+    prompts: [
+      "I can't stop feeling angry at someone",
+      'I carry guilt I cannot let go of',
+      'I am overwhelmed by fear and anxiety',
+      'I feel envious of others and ashamed of it',
+    ],
+  },
+  {
+    label: 'Big questions',
+    color: 'text-indigo-600 dark:text-indigo-400',
+    border: 'border-indigo-200 dark:border-indigo-800',
+    bg: 'hover:bg-indigo-50 dark:hover:bg-indigo-900/20',
+    prompts: [
+      'Why do innocent people suffer?',
+      'Is there meaning after death?',
+      'How do I know what is right from wrong?',
+      'Does prayer actually change anything?',
+    ],
+  },
+  {
+    label: 'Relationships',
+    color: 'text-emerald-600 dark:text-emerald-400',
+    border: 'border-emerald-200 dark:border-emerald-800',
+    bg: 'hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
+    prompts: [
+      'How do I forgive someone who hurt me deeply?',
+      'What does scripture say about loving your enemy?',
+      'How should I treat the poor and suffering?',
+      'What makes a good and meaningful life?',
+    ],
+  },
 ];
 
 // Auto-detect religion mentions in a question
@@ -47,11 +91,13 @@ function detectReligions(text: string): Religion[] {
 }
 
 export default function QueryChat() {
+  const { globalReligions } = useSettings();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<QueryMode>('simple');
-  const [selectedReligions, setSelectedReligions] = useState<Religion[]>([]);
+  const [selectedReligions, setSelectedReligions] = useState<Religion[]>(globalReligions);
+  const [language, setLanguage] = useState<string>('English');
   const [error, setError] = useState<string | null>(null);
   const [listening, setListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -99,6 +145,7 @@ export default function QueryChat() {
         religions: religionsToUse,
         mode,
         history: history.length > 0 ? history : null,
+        language: language !== 'English' ? language : null,
       });
 
       const assistantMessage: ChatMessage = {
@@ -192,32 +239,41 @@ export default function QueryChat() {
       {/* Controls bar */}
       <div className="border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-4">
-          {/* Mode toggle */}
+          {/* Mode toggle — 3-way */}
           <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
-            <button
-              onClick={() => setMode('simple')}
-              className={clsx(
-                'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
-                mode === 'simple'
-                  ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-gray-100'
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-              )}
+            {([
+              { key: 'child', label: 'Child', Icon: Baby },
+              { key: 'simple', label: 'Simple', Icon: MessageCircle },
+              { key: 'scholar', label: 'Scholar', Icon: GraduationCap },
+            ] as { key: QueryMode; label: string; Icon: React.ElementType }[]).map(({ key, label, Icon }) => (
+              <button
+                key={key}
+                onClick={() => setMode(key)}
+                className={clsx(
+                  'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+                  mode === key
+                    ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-gray-100'
+                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                )}
+              >
+                <Icon size={13} />
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Language selector */}
+          <div className="flex items-center gap-1.5">
+            <Globe size={13} className="text-gray-400" />
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="rounded-md border border-gray-200 bg-white py-1 pl-2 pr-6 text-xs text-gray-700 focus:border-indigo-400 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
             >
-              <MessageCircle size={13} />
-              Simple
-            </button>
-            <button
-              onClick={() => setMode('scholar')}
-              className={clsx(
-                'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
-                mode === 'scholar'
-                  ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-gray-100'
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-              )}
-            >
-              <GraduationCap size={13} />
-              Scholar
-            </button>
+              {['English','Spanish','French','German','Arabic','Hindi','Portuguese','Mandarin','Bengali','Urdu'].map((lang) => (
+                <option key={lang} value={lang}>{lang}</option>
+              ))}
+            </select>
           </div>
 
           {/* Religion filters */}
@@ -244,26 +300,45 @@ export default function QueryChat() {
       <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="mx-auto max-w-3xl space-y-6">
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="mb-4 text-4xl">📖</div>
-              <h2 className="mb-2 text-xl font-bold text-gray-800 dark:text-gray-200">
-                Ask the Scriptures
-              </h2>
-              <p className="mb-6 max-w-md text-sm text-gray-500 dark:text-gray-400">
-                Ask any question and receive answers grounded exclusively in sacred
-                scripture from across traditions. All citations included.
-              </p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {QUICK_QUESTIONS.map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => sendMessage(q)}
-                    className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
+            <div className="py-8">
+              <div className="mb-8 text-center">
+                <div className="mb-3 text-4xl">📖</div>
+                <h2 className="mb-2 text-xl font-bold text-gray-800 dark:text-gray-200">
+                  What's on your mind?
+                </h2>
+                <p className="mx-auto max-w-sm text-sm text-gray-500 dark:text-gray-400">
+                  You don't need a religious question. Describe something real —
+                  scripture from six traditions will speak to it.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {PROMPT_CATEGORIES.map((cat) => (
+                  <div
+                    key={cat.label}
+                    className={`rounded-xl border bg-white p-4 dark:bg-gray-900 ${cat.border}`}
                   >
-                    {q}
-                  </button>
+                    <p className={`mb-3 text-xs font-bold uppercase tracking-wider ${cat.color}`}>
+                      {cat.label}
+                    </p>
+                    <div className="space-y-1">
+                      {cat.prompts.map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => sendMessage(p)}
+                          className={`w-full rounded-lg border border-transparent px-3 py-2 text-left text-sm text-gray-700 transition-colors dark:text-gray-300 ${cat.bg} hover:border-gray-200 dark:hover:border-gray-700`}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
+
+              <p className="mt-6 text-center text-xs text-gray-400 dark:text-gray-600">
+                Every answer is grounded exclusively in scripture — no opinions, always cited.
+              </p>
             </div>
           )}
 

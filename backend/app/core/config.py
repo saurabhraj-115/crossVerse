@@ -4,11 +4,12 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     openai_api_key: str = ""
+    anthropic_api_key: str = ""
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
     qdrant_collection: str = "scriptures"
     embedding_model: str = "text-embedding-3-small"
-    llm_model: str = "gpt-4o"
+    llm_model: str = "claude-sonnet-4-6"
     embedding_dimension: int = 1536
     top_k_results: int = 8
     batch_size: int = 20

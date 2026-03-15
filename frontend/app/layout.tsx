@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import { SettingsProvider } from '@/lib/settings-context';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,8 +26,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Navbar />
-          <main className="min-h-screen">{children}</main>
+          <SettingsProvider>
+            <Navbar />
+            <main className="min-h-screen">{children}</main>
+          </SettingsProvider>
         </ThemeProvider>
       </body>
     </html>
