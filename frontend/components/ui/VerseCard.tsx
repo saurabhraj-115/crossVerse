@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { RELIGION_COLORS, type Religion, type ScriptureChunk } from '@/lib/types';
 import ReligionBadge from './ReligionBadge';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface VerseCardProps {
   chunk: ScriptureChunk;
@@ -12,6 +13,7 @@ interface VerseCardProps {
 
 export default function VerseCard({ chunk, index, compact = false }: VerseCardProps) {
   const borderColor = RELIGION_COLORS[chunk.religion as Religion] ?? '#6B7280';
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <div
@@ -31,23 +33,50 @@ export default function VerseCard({ chunk, index, compact = false }: VerseCardPr
             {chunk.reference}
           </span>
         </div>
-        {chunk.score !== undefined && chunk.score !== null && (
-          <span className="shrink-0 text-xs text-gray-400 dark:text-gray-500">
-            {(chunk.score * 100).toFixed(0)}% match
-          </span>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          {chunk.score !== undefined && chunk.score !== null && (
+            <span className="text-xs text-gray-400 dark:text-gray-500">
+              {(chunk.score * 100).toFixed(0)}% match
+            </span>
+          )}
+          <button
+            onClick={() => setExpanded((e) => !e)}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            title={expanded ? 'Collapse' : 'Expand'}
+          >
+            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+        </div>
       </div>
 
-      {!compact && (
-        <p className="mt-2 text-sm leading-relaxed text-gray-700 italic dark:text-gray-300">
+      {/* Collapsed: always show a preview */}
+      {!expanded && (
+        <p
+          className={`mt-1 leading-relaxed text-gray-700 italic dark:text-gray-300 cursor-pointer ${
+            compact ? 'line-clamp-2 text-xs' : 'line-clamp-3 text-sm'
+          }`}
+          onClick={() => setExpanded(true)}
+        >
           &ldquo;{chunk.text}&rdquo;
         </p>
       )}
 
-      {compact && (
-        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-gray-600 italic dark:text-gray-400">
-          &ldquo;{chunk.text}&rdquo;
-        </p>
+      {/* Expanded: full text highlighted */}
+      {expanded && (
+        <div
+          className="mt-2 rounded-lg p-3 cursor-pointer"
+          style={{ backgroundColor: `${borderColor}15` }}
+          onClick={() => setExpanded(false)}
+        >
+          <p className="text-sm leading-relaxed text-gray-800 italic dark:text-gray-200 whitespace-pre-wrap">
+            &ldquo;{chunk.text}&rdquo;
+          </p>
+          {chunk.book && (
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              {chunk.book}{chunk.chapter ? `, Chapter ${chunk.chapter}` : ''}{chunk.verse ? `, Verse ${chunk.verse}` : ''}
+            </p>
+          )}
+        </div>
       )}
 
       <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">{chunk.translation}</p>
