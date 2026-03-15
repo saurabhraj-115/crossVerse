@@ -4,7 +4,7 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across six m
 
 ## Scripture Database
 
-**94,500+ verses** across all six traditions:
+**120,000+ verses** across all six traditions:
 
 | Religion | Scriptures | Verses |
 |----------|-----------|--------|
@@ -12,7 +12,7 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across six m
 | Islam | The Holy Quran (full) + Sahih Bukhari Hadith | 13,813 |
 | Judaism | Full Tanakh (39 books, Sefaria / JPS 1917) | 23,307 |
 | Sikhism | Guru Granth Sahib (full, BaniDB) | 24,703 |
-| Hinduism | Bhagavad Gita · Yoga Sutras · Isa, Katha, Kena Upanishads | 1,089 |
+| Hinduism | Bhagavad Gita · Yoga Sutras · 10 Upanishads · Bhagavata Purana · Ramayana · Mahabharata (18 Parvas) · Manusmriti · Four Vedas | 30,000+ |
 | Buddhism | Dhammapada (full, SuttaCentral / Bhikkhu Sujato) | 514 |
 
 ## Features
@@ -106,7 +106,13 @@ python -m scripts.ingest_guru_granth_full    # Guru Granth Sahib (BaniDB) — 24
 python -m scripts.ingest_gita_full           # Bhagavad Gita — 700 verses
 python -m scripts.ingest_yoga_sutras_full    # Yoga Sutras — 196 sutras
 python -m scripts.ingest_dhammapada_full     # Dhammapada — 423 verses
-python -m scripts.ingest_upanishads_full     # Principal Upanishads (Gutenberg) — 171 verses
+python -m scripts.ingest_upanishads_full     # Isa, Katha, Kena Upanishads — 171 verses
+python -m scripts.ingest_upanishads_more     # 9 more Upanishads (SBE Vol 1 & 15, Archive.org)
+python -m scripts.ingest_bhagavatam          # Bhagavata Purana
+python -m scripts.ingest_ramayana            # Ramayana (Griffith translation)
+python -m scripts.ingest_mahabharata         # Mahabharata — 18 Parvas (Ganguli translation)
+python -m scripts.ingest_manusmriti          # Manusmriti
+python -m scripts.ingest_vedas               # Vedas (Griffith translation)
 ```
 
 ### 5. Start the Frontend
@@ -239,3 +245,4 @@ crossVerse/
 | `LLM_MODEL` | `claude-sonnet-4-6` | Anthropic Claude model ID |
 | `TOP_K_RESULTS` | `8` | Number of passages retrieved per query |
 | `ALLOWED_ORIGINS` | `http://localhost:3000` | CORS allowed origins (comma-separated) |
+| `RATE_LIMIT` | `30/minute` | Rate limit per IP (e.g. `60/minute`, `100/hour`) |
