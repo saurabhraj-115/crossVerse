@@ -15,26 +15,32 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across six m
 | Hinduism | Bhagavad Gita · Yoga Sutras · 10 Upanishads · Bhagavata Purana · Ramayana · Mahabharata (18 Parvas) · Manusmriti · Four Vedas | 30,000+ |
 | Buddhism | Dhammapada (full, SuttaCentral / Bhikkhu Sujato) | 514 |
 
+---
+
 ## Features
 
 | Feature | Description |
 |---------|-------------|
+| **Living Hero** | Homepage auto-loads today's daily theme and animates 6 tradition cards into view — the AHA moment on first load |
 | **Ask** | Scripture-grounded Q&A with citations — Simple, Scholar, or Child mode |
 | **Compare** | Side-by-side view of what each tradition says about any topic |
 | **Debate** | Each tradition's scriptures respond to a question independently |
-| **Explore** | Curated topic browser across 7 categories and 35+ topics |
-| **Contradictions** | Find apparent tensions within a single tradition |
+| **Universal Truth** | Enter any concept — find the single truth all 6 traditions agree on |
+| **Mood Scripture** | Select how you're feeling (grief, joy, anxiety…) — receive scripture that meets you there |
+| **Topic Explorer** | Curated topic browser across 7 categories and 35+ topics |
+| **Daily Briefing** | A new spiritual theme each day with verses from all 6 traditions |
+| **Concept Archaeology** | Trace how an idea (forgiveness, soul, justice…) evolved across traditions |
+| **Semantic Graph** | Visual force-directed graph of verse similarities across traditions |
+| **Spiritual Fingerprint** | Answer questions, discover which tradition resonates most |
 | **Life Situations** | Get scripture wisdom for specific life moments (grief, marriage, career…) |
 | **Fact Check** | Verify religious claims against actual scripture |
 | **Ethics** | Multi-tradition ethical perspectives on moral dilemmas |
-| **Daily Briefing** | A new spiritual theme each day with verses from all 6 traditions |
-| **Spiritual Fingerprint** | Answer questions, discover which tradition resonates most |
-| **Concept Archaeology** | Trace how an idea (forgiveness, soul, justice…) evolved across traditions |
-| **Semantic Graph** | Visual force-directed graph of verse similarities across traditions |
 | **Study Plans** | AI-generated multi-week study plans on any topic |
 | **Voice Input** | Speak your question — mic transcription built in |
 | **Share & Cite** | Native OS share sheet + Chicago / MLA / SBL citation formats per verse |
 | **Dark Mode** | Full dark mode across all pages |
+
+---
 
 ## Tech Stack
 
@@ -140,6 +146,8 @@ Frontend available at `http://localhost:3000`.
 | `POST` | `/ethics` | Multi-tradition ethical perspectives |
 | `POST` | `/study` | Generate a multi-week study plan |
 | `POST` | `/archaeology` | Trace a concept's development across traditions |
+| `POST` | `/universal` | Find the universal truth all traditions share on a concept |
+| `POST` | `/mood` | Scripture matched to an emotional state |
 | `POST` | `/similarity/verse` | Find semantically similar verses cross-tradition |
 | `POST` | `/similarity/graph` | Graph data for semantic similarity visualization |
 | `POST` | `/fingerprint/analyze` | Analyze a user's spiritual fingerprint |
@@ -150,6 +158,24 @@ Frontend available at `http://localhost:3000`.
 | `GET`  | `/topics` | Curated topic list |
 | `GET`  | `/health` | Health check |
 | `GET`  | `/docs` | Interactive API documentation (Swagger) |
+
+### Example: Universal Truth
+
+```bash
+curl -X POST http://localhost:8000/universal \
+  -H "Content-Type: application/json" \
+  -d '{"concept": "compassion"}'
+# Returns: universal_truth sentence + how each of the 6 traditions expresses it
+```
+
+### Example: Mood Scripture
+
+```bash
+curl -X POST http://localhost:8000/mood \
+  -H "Content-Type: application/json" \
+  -d '{"mood": "grief"}'
+# Returns: warm wisdom message + 12 verses from across traditions
+```
 
 ### Example: Ask a question
 
@@ -167,14 +193,6 @@ curl -X POST http://localhost:8000/compare \
   -d '{"topic": "forgiveness", "religions": ["Christianity", "Islam", "Buddhism"]}'
 ```
 
-### Example: Concept Archaeology
-
-```bash
-curl -X POST http://localhost:8000/archaeology \
-  -H "Content-Type: application/json" \
-  -d '{"concept": "compassion"}'
-```
-
 ---
 
 ## Project Structure
@@ -184,7 +202,7 @@ crossVerse/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py                  # FastAPI app entry point + router registration
-│   │   ├── api/routes/              # Route handlers (query, compare, debate, daily, …)
+│   │   ├── api/routes/              # Route handlers (query, compare, debate, daily, universal, mood, …)
 │   │   ├── core/                    # Config, Qdrant client, Anthropic LLM client
 │   │   ├── models/schemas.py        # Pydantic request/response models
 │   │   └── services/                # RAG pipeline, embeddings, scripture utils
@@ -194,10 +212,12 @@ crossVerse/
 │   └── Dockerfile
 ├── frontend/
 │   ├── app/                         # Next.js App Router pages
-│   │   ├── page.tsx                 # Home / Ask
+│   │   ├── page.tsx                 # Homepage with Living Hero
 │   │   ├── compare/                 # Compare traditions
 │   │   ├── debate/                  # Debate engine
 │   │   ├── daily/                   # Daily briefing
+│   │   ├── universal/               # Universal Truth
+│   │   ├── mood/                    # Mood Scripture
 │   │   ├── situations/              # Life situations
 │   │   ├── fingerprint/             # Spiritual fingerprint quiz
 │   │   ├── graph/                   # Semantic similarity graph
@@ -207,12 +227,14 @@ crossVerse/
 │   │   └── ethics/                  # Ethics perspectives
 │   ├── components/
 │   │   ├── ui/                      # VerseCard, ReligionBadge, …
+│   │   ├── LivingHero.tsx           # Auto-loading homepage hero
 │   │   ├── QueryChat.tsx            # Main chat interface
 │   │   ├── CompareView.tsx          # Side-by-side comparison
 │   │   └── Navbar.tsx               # Navigation
 │   ├── lib/
 │   │   ├── api.ts                   # API client functions
-│   │   └── types.ts                 # TypeScript interfaces
+│   │   ├── types.ts                 # TypeScript interfaces
+│   │   └── settings-context.tsx     # Global preferences context
 │   └── tailwind.config.js
 ├── data/                            # Raw scripture data directories
 ├── docker-compose.yml
