@@ -87,7 +87,8 @@ async def ingest_bible():
 
         points = [
             PointStruct(
-                id=str(uuid.uuid4()),
+                id=str(uuid.uuid5(uuid.NAMESPACE_DNS,
+                    f"Christianity:KJV:{verse['book']}:{verse['chapter']}:{verse['verse']}")),
                 vector=emb,
                 payload=verse,
             )

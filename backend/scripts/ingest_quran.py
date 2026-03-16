@@ -81,7 +81,12 @@ async def ingest_quran():
         embeddings = await embed_texts(texts, batch_size=BATCH_SIZE)
 
         points = [
-            PointStruct(id=str(uuid.uuid4()), vector=emb, payload=verse)
+            PointStruct(
+                id=str(uuid.uuid5(uuid.NAMESPACE_DNS,
+                    f"Islam:Quran:{verse['chapter']}:{verse['verse']}")),
+                vector=emb,
+                payload=verse,
+            )
             for verse, emb in zip(batch, embeddings)
         ]
 
