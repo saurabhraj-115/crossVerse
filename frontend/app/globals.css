@@ -32,3 +32,14 @@
   from { transform: translateY(10px); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
 }
+
+.verse-card-enter {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.verse-card-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}

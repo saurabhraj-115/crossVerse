@@ -289,3 +289,43 @@ class ArchaeologyResponse(BaseModel):
     concept: str
     analysis: str
     sources: List[ScriptureChunk]
+
+
+# ---------------------------------------------------------------------------
+# Universal Truth
+# ---------------------------------------------------------------------------
+
+class UniversalRequest(BaseModel):
+    concept: str = Field(..., min_length=2, max_length=500)
+    religions: Optional[List[str]] = None
+
+
+class TraditionExpression(BaseModel):
+    verse_text: str
+    reference: str
+    reflection: str  # 1 sentence: how THIS tradition uniquely expresses the universal truth
+
+
+class UniversalResponse(BaseModel):
+    concept: str
+    universal_truth: str  # single bold sentence all traditions agree on
+    tradition_expressions: Dict[str, TraditionExpression]
+    sources: List[ScriptureChunk]
+
+
+# ---------------------------------------------------------------------------
+# Mood Scripture
+# ---------------------------------------------------------------------------
+
+VALID_MOODS = {"grief", "joy", "anxiety", "fear", "hope", "loneliness", "anger", "gratitude", "confusion", "love"}
+
+
+class MoodRequest(BaseModel):
+    mood: str = Field(..., pattern="^(grief|joy|anxiety|fear|hope|loneliness|anger|gratitude|confusion|love)$")
+
+
+class MoodResponse(BaseModel):
+    mood: str
+    message: str
+    verses: List[ScriptureChunk]
+    sources: List[ScriptureChunk]

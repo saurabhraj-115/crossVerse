@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import {
-  BookOpen, Scale, Swords, Compass, ArrowRight, Sparkles,
+  BookOpen, Scale, Swords, ArrowRight,
   Heart, CheckCircle2, Flame, Fingerprint, Network, Microscope, Calendar, GraduationCap,
 } from 'lucide-react';
+import LivingHero from '@/components/LivingHero';
 
 const QUICK_TOPICS = [
   { label: 'Love', emoji: '❤️' },
@@ -39,14 +40,6 @@ const CORE_FEATURES = [
     href: '/debate',
     color: 'text-rose-600 dark:text-rose-400',
     bg: 'bg-rose-50 dark:bg-rose-900/30',
-  },
-  {
-    icon: Compass,
-    title: 'Topic Explorer',
-    description: 'Browse curated topics across universal themes, ethics, society, and spirituality.',
-    href: '/explore',
-    color: 'text-emerald-600 dark:text-emerald-400',
-    bg: 'bg-emerald-50 dark:bg-emerald-900/30',
   },
 ];
 
@@ -154,47 +147,41 @@ function FeatureCard({ icon: Icon, title, description, href, color, bg }: {
   );
 }
 
+const MOODS = [
+  { label: 'Grief', emoji: '🌧️' },
+  { label: 'Joy', emoji: '☀️' },
+  { label: 'Anxiety', emoji: '🌊' },
+  { label: 'Fear', emoji: '😰' },
+  { label: 'Hope', emoji: '🌿' },
+  { label: 'Loneliness', emoji: '🕯️' },
+  { label: 'Anger', emoji: '🔥' },
+  { label: 'Gratitude', emoji: '🙏' },
+  { label: 'Confusion', emoji: '🌀' },
+  { label: 'Love', emoji: '❤️' },
+];
+
 export default function HomePage() {
   return (
     <div className="flex flex-col">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-indigo-950 via-indigo-900 to-indigo-800 px-4 py-24 text-center text-white">
-        <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-violet-600/20 blur-3xl" />
-        <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-indigo-400/20 blur-3xl" />
+      {/* Living Hero — auto-loads daily briefing */}
+      <LivingHero />
 
-        <div className="relative mx-auto max-w-4xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm backdrop-blur-sm">
-            <Sparkles size={14} className="text-yellow-300" />
-            AI-powered scripture exploration
-          </div>
-
-          <h1 className="mb-6 text-5xl font-extrabold leading-tight sm:text-6xl">
-            What does every religion say
-            <br />
-            <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-              about any topic?
-            </span>
-          </h1>
-
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-indigo-200">
-            CrossVerse uses AI retrieval to surface relevant scripture from six major
-            traditions. Every answer is grounded in text — no opinion, no commentary,
-            always cited.
+      {/* Mood pill strip */}
+      <section className="border-b border-gray-200 bg-white px-4 py-6 dark:border-gray-800 dark:bg-gray-900">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            How are you feeling today?
           </p>
-
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/query"
-              className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-indigo-900 hover:bg-indigo-50 transition-colors shadow-lg"
-            >
-              Ask a Question <ArrowRight size={18} />
-            </Link>
-            <Link
-              href="/fingerprint"
-              className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-6 py-3 font-semibold text-white hover:bg-white/20 transition-colors backdrop-blur-sm"
-            >
-              Find Your Tradition
-            </Link>
+          <div className="flex flex-wrap justify-center gap-2">
+            {MOODS.map(({ label, emoji }) => (
+              <Link
+                key={label}
+                href={`/mood?mood=${label.toLowerCase()}`}
+                className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-indigo-300 hover:text-indigo-700 transition-colors shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
+              >
+                <span>{emoji}</span> {label}
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -228,7 +215,7 @@ export default function HomePage() {
           <p className="mb-10 text-center text-gray-500 dark:text-gray-400">
             From quick answers to deep cross-tradition analysis
           </p>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-3">
             {CORE_FEATURES.map((f) => <FeatureCard key={f.href} {...f} />)}
           </div>
         </div>

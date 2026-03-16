@@ -112,7 +112,6 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                   >
                     <span className="text-base">{RELIGION_EMOJI[r]}</span>
                     <span>{r}</span>
-                    {/* deselected indicator */}
                     {!active && (
                       <span className="ml-auto text-[10px] font-normal text-gray-400 dark:text-gray-600">off</span>
                     )}

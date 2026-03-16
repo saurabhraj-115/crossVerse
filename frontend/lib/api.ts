@@ -27,6 +27,10 @@ import type {
   StudyResponse,
   ArchaeologyRequest,
   ArchaeologyResponse,
+  UniversalRequest,
+  UniversalResponse,
+  MoodRequest,
+  MoodResponse,
 } from './types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -159,6 +163,20 @@ export async function generateStudyPlan(request: StudyRequest): Promise<StudyRes
 
 export async function archaeologyConcept(request: ArchaeologyRequest): Promise<ArchaeologyResponse> {
   return fetchAPI<ArchaeologyResponse>('/archaeology', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+export async function findUniversalTruth(request: UniversalRequest): Promise<UniversalResponse> {
+  return fetchAPI<UniversalResponse>('/universal', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+export async function getMoodScripture(request: MoodRequest): Promise<MoodResponse> {
+  return fetchAPI<MoodResponse>('/mood', {
     method: 'POST',
     body: JSON.stringify(request),
   });
