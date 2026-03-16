@@ -290,3 +290,42 @@ export interface ArchaeologyResponse {
   analysis: string;
   sources: ScriptureChunk[];
 }
+
+// ---------------------------------------------------------------------------
+// Universal Truth
+// ---------------------------------------------------------------------------
+export interface UniversalRequest {
+  concept: string;
+  religions?: Religion[] | null;
+}
+
+export interface TraditionExpression {
+  verse_text: string;
+  reference: string;
+  reflection: string;
+}
+
+export interface UniversalResponse {
+  concept: string;
+  universal_truth: string;
+  tradition_expressions: Record<Religion, TraditionExpression>;
+  sources: ScriptureChunk[];
+}
+
+// ---------------------------------------------------------------------------
+// Mood Scripture
+// ---------------------------------------------------------------------------
+export type MoodType =
+  | 'grief' | 'joy' | 'anxiety' | 'fear' | 'hope'
+  | 'loneliness' | 'anger' | 'gratitude' | 'confusion' | 'love';
+
+export interface MoodRequest {
+  mood: MoodType;
+}
+
+export interface MoodResponse {
+  mood: string;
+  message: string;
+  verses: ScriptureChunk[];
+  sources: ScriptureChunk[];
+}

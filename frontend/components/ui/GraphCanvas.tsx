@@ -247,7 +247,7 @@ export default function GraphCanvas({
     type CE = [string, { x: number; y: number }];
     const clusterLabels = clusterLblLayer
       .selectAll<SVGTextElement, CE>('text')
-      .data([...centroidMap.entries()] as CE[])
+      .data(Array.from(centroidMap.entries()) as CE[])
       .enter()
       .append('text')
       .attr('text-anchor', 'middle')

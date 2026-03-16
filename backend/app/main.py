@@ -10,6 +10,7 @@ from slowapi.util import get_remote_address
 from app.api.routes import (
     query, compare, contradictions, verse, debate, topics,
     situations, factcheck, ethics, daily, fingerprint, similarity, study, archaeology,
+    universal, mood,
 )
 from app.core.config import get_settings
 from app.core.qdrant_client import ensure_collection_exists
@@ -79,6 +80,8 @@ app.include_router(fingerprint.router, tags=["Fingerprint"])
 app.include_router(similarity.router, tags=["Similarity"])
 app.include_router(study.router, tags=["Study"])
 app.include_router(archaeology.router, tags=["Archaeology"])
+app.include_router(universal.router, tags=["Universal"])
+app.include_router(mood.router, tags=["Mood"])
 
 
 @app.get("/", tags=["Health"])

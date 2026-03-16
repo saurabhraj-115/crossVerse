@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes';
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import {
-  BookOpen, Scale, Swords, Compass, Sun, Moon, ChevronDown,
+  BookOpen, Scale, Swords, Compass, Sparkles, Sun, Moon, ChevronDown,
   Network, Microscope, Calendar, Heart, CheckCircle2, Flame,
   Fingerprint, GraduationCap, Settings,
 } from 'lucide-react';
@@ -16,13 +16,14 @@ const CORE_NAV = [
   { href: '/query', label: 'Ask', icon: BookOpen },
   { href: '/compare', label: 'Compare', icon: Scale },
   { href: '/debate', label: 'Debate', icon: Swords },
-  { href: '/explore', label: 'Explore', icon: Compass },
 ];
 
 const EXPLORE_ITEMS = [
+  { href: '/explore', label: 'Topic Explorer', icon: Compass, desc: 'Browse curated topics by theme' },
   { href: '/graph', label: 'Similarity Graph', icon: Network, desc: 'Visualize verse connections' },
   { href: '/archaeology', label: 'Archaeology', icon: Microscope, desc: 'Trace concepts across traditions' },
   { href: '/daily', label: 'Daily Briefing', icon: Calendar, desc: "Today's theme from all traditions" },
+  { href: '/universal', label: 'Universal Truth', icon: Sparkles, desc: 'What all traditions agree on' },
 ];
 
 const TOOLS_ITEMS = [
