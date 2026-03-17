@@ -30,6 +30,14 @@ from scripts.ingest_ramayana import ingest_ramayana
 from scripts.ingest_mahabharata import ingest_mahabharata
 from scripts.ingest_manusmriti import ingest_manusmriti
 from scripts.ingest_vedas import ingest_vedas
+from scripts.ingest_pali_canon import ingest_pali_canon
+from scripts.ingest_hadith_extra import ingest_hadith_extra
+from scripts.ingest_pirkei_avot import ingest_pirkei_avot
+from scripts.ingest_mishnah import ingest_mishnah
+from scripts.ingest_confucianism import ingest_confucianism
+from scripts.ingest_taoism import ingest_taoism
+from scripts.ingest_jainism import ingest_jainism
+from scripts.ingest_zoroastrianism import ingest_zoroastrianism
 
 logging.basicConfig(
     level=logging.INFO,
@@ -50,15 +58,27 @@ INGESTION_STEPS = [
     ("The Four Vedas – Griffith translations", ingest_vedas),
     # Buddhism
     ("Dhammapada – full 423 verses", ingest_dhammapada_full),
+    ("Pali Canon – Majjhima, Samyutta & Anguttara Nikaya (SuttaCentral)", ingest_pali_canon),
     # Sikhism
     ("Guru Granth Sahib – full 1430 angs", ingest_guru_granth_full),
     # Islam
     ("Quran – complete", ingest_quran),
     ("Hadith – Sahih Bukhari", ingest_hadith_full),
+    ("Hadith – Sahih Muslim, Nawawi 40, Abu Dawud", ingest_hadith_extra),
     # Christianity
     ("Bible KJV – complete", ingest_bible),
     # Judaism
     ("Tanakh – full 39 books", ingest_tanakh_full),
+    ("Pirkei Avot – 6 chapters (Sefaria)", ingest_pirkei_avot),
+    ("Mishnah – 62 tractates / 6 orders (Sefaria)", ingest_mishnah),
+    # Confucianism
+    ("Analects of Confucius + Mencius (James Legge)", ingest_confucianism),
+    # Taoism
+    ("Tao Te Ching + Zhuangzi inner chapters (James Legge)", ingest_taoism),
+    # Jainism
+    ("Uttaradhyayana Sutra + Acaranga Sutra (Hermann Jacobi)", ingest_jainism),
+    # Zoroastrianism
+    ("Gathas of Zarathustra + Vendidad (Mills & Darmesteter)", ingest_zoroastrianism),
 ]
 
 
