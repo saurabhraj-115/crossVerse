@@ -13,6 +13,10 @@ RELIGION_COLORS = {
     "Buddhism": "#EAB308",
     "Judaism": "#8B5CF6",
     "Sikhism": "#14B8A6",
+    "Jainism": "#EA580C",
+    "Zoroastrianism": "#D97706",
+    "Confucianism": "#78716C",
+    "Taoism": "#059669",
 }
 
 SUPPORTED_RELIGIONS = list(RELIGION_COLORS.keys())
