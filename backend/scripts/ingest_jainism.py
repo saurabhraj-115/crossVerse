@@ -1,9 +1,8 @@
 """
-Ingest Jain scriptures from Sacred Texts Archive (Hermann Jacobi translation, Public Domain):
-  - Uttaradhyayana Sutra (36 lectures) — core Jain ethics & philosophy
-  - Acaranga Sutra (2 books) — oldest Jain text, Mahavira's asceticism
+Ingest Jain scriptures from Project Gutenberg plain text (Public Domain):
+  - Jain Sutras Part I: Acaranga Sutra + Kalpa Sutra (Hermann Jacobi, PG #8818)
+  - Jain Sutras Part II: Uttaradhyayana Sutra + Sutrakritanga (Hermann Jacobi, PG #12459)
 
-Source: Sacred Books of the East, Vols 22 & 45 (Oxford, Public Domain).
 Re-running is safe — deterministic UUIDs, upsert only.
 """
 
@@ -30,115 +29,122 @@ logger = logging.getLogger(__name__)
 
 RELIGION   = "Jainism"
 BATCH_SIZE = 20
+MAX_WORDS  = 200   # target words per chunk
 
 TEXTS = [
     {
-        "name":        "Uttaradhyayana Sutra",
-        "id_prefix":   "Uttaradhyayana",
-        "translation": "Uttaradhyayana Sutra (Hermann Jacobi, Sacred Books of the East, Public Domain)",
-        "pages": [
-            ("https://www.sacred-texts.com/jai/su2/su201.htm", "Uttaradhyayana – Lecture 1"),
-            ("https://www.sacred-texts.com/jai/su2/su202.htm", "Uttaradhyayana – Lecture 2"),
-            ("https://www.sacred-texts.com/jai/su2/su203.htm", "Uttaradhyayana – Lecture 3"),
-            ("https://www.sacred-texts.com/jai/su2/su204.htm", "Uttaradhyayana – Lecture 4"),
-            ("https://www.sacred-texts.com/jai/su2/su205.htm", "Uttaradhyayana – Lecture 5"),
-            ("https://www.sacred-texts.com/jai/su2/su206.htm", "Uttaradhyayana – Lecture 6"),
-            ("https://www.sacred-texts.com/jai/su2/su207.htm", "Uttaradhyayana – Lecture 7"),
-            ("https://www.sacred-texts.com/jai/su2/su208.htm", "Uttaradhyayana – Lecture 8"),
-            ("https://www.sacred-texts.com/jai/su2/su209.htm", "Uttaradhyayana – Lecture 9"),
-            ("https://www.sacred-texts.com/jai/su2/su210.htm", "Uttaradhyayana – Lecture 10"),
-            ("https://www.sacred-texts.com/jai/su2/su211.htm", "Uttaradhyayana – Lecture 11"),
-            ("https://www.sacred-texts.com/jai/su2/su212.htm", "Uttaradhyayana – Lecture 12"),
-            ("https://www.sacred-texts.com/jai/su2/su213.htm", "Uttaradhyayana – Lecture 13"),
-            ("https://www.sacred-texts.com/jai/su2/su214.htm", "Uttaradhyayana – Lecture 14"),
-            ("https://www.sacred-texts.com/jai/su2/su215.htm", "Uttaradhyayana – Lecture 15"),
-            ("https://www.sacred-texts.com/jai/su2/su216.htm", "Uttaradhyayana – Lecture 16"),
-            ("https://www.sacred-texts.com/jai/su2/su217.htm", "Uttaradhyayana – Lecture 17"),
-            ("https://www.sacred-texts.com/jai/su2/su218.htm", "Uttaradhyayana – Lecture 18"),
-            ("https://www.sacred-texts.com/jai/su2/su219.htm", "Uttaradhyayana – Lecture 19"),
-            ("https://www.sacred-texts.com/jai/su2/su220.htm", "Uttaradhyayana – Lecture 20"),
-            ("https://www.sacred-texts.com/jai/su2/su221.htm", "Uttaradhyayana – Lecture 21"),
-            ("https://www.sacred-texts.com/jai/su2/su222.htm", "Uttaradhyayana – Lecture 22"),
-            ("https://www.sacred-texts.com/jai/su2/su223.htm", "Uttaradhyayana – Lecture 23"),
-            ("https://www.sacred-texts.com/jai/su2/su224.htm", "Uttaradhyayana – Lecture 24"),
-            ("https://www.sacred-texts.com/jai/su2/su225.htm", "Uttaradhyayana – Lecture 25"),
-            ("https://www.sacred-texts.com/jai/su2/su226.htm", "Uttaradhyayana – Lecture 26"),
-            ("https://www.sacred-texts.com/jai/su2/su227.htm", "Uttaradhyayana – Lecture 27"),
-            ("https://www.sacred-texts.com/jai/su2/su228.htm", "Uttaradhyayana – Lecture 28"),
-            ("https://www.sacred-texts.com/jai/su2/su229.htm", "Uttaradhyayana – Lecture 29"),
-            ("https://www.sacred-texts.com/jai/su2/su230.htm", "Uttaradhyayana – Lecture 30"),
-            ("https://www.sacred-texts.com/jai/su2/su231.htm", "Uttaradhyayana – Lecture 31"),
-            ("https://www.sacred-texts.com/jai/su2/su232.htm", "Uttaradhyayana – Lecture 32"),
-            ("https://www.sacred-texts.com/jai/su2/su233.htm", "Uttaradhyayana – Lecture 33"),
-            ("https://www.sacred-texts.com/jai/su2/su234.htm", "Uttaradhyayana – Lecture 34"),
-            ("https://www.sacred-texts.com/jai/su2/su235.htm", "Uttaradhyayana – Lecture 35"),
-            ("https://www.sacred-texts.com/jai/su2/su236.htm", "Uttaradhyayana – Lecture 36"),
-        ],
-        "ref_fmt": "Uttaradhyayana {lec}:{v}",
+        "url":         "https://www.gutenberg.org/cache/epub/8818/pg8818.txt",
+        "name":        "Jain Sutras Part I (Acaranga + Kalpa Sutra)",
+        "id_prefix":   "JainSutras1",
+        "translation": "Jain Sutras Part I (Hermann Jacobi, Sacred Books of the East, Public Domain)",
+        "book_default": "Acaranga Sutra",
+        "ref_prefix":  "Jain Sutras I",
     },
     {
-        "name":        "Acaranga Sutra",
-        "id_prefix":   "Acaranga",
-        "translation": "Acaranga Sutra (Hermann Jacobi, Sacred Books of the East, Public Domain)",
-        "pages": [
-            ("https://www.sacred-texts.com/jai/su1/su101.htm", "Acaranga Sutra – Book 1, Lecture 1"),
-            ("https://www.sacred-texts.com/jai/su1/su102.htm", "Acaranga Sutra – Book 1, Lecture 2"),
-            ("https://www.sacred-texts.com/jai/su1/su103.htm", "Acaranga Sutra – Book 1, Lecture 3"),
-            ("https://www.sacred-texts.com/jai/su1/su104.htm", "Acaranga Sutra – Book 1, Lecture 4"),
-            ("https://www.sacred-texts.com/jai/su1/su105.htm", "Acaranga Sutra – Book 1, Lecture 5"),
-            ("https://www.sacred-texts.com/jai/su1/su106.htm", "Acaranga Sutra – Book 1, Lecture 6"),
-            ("https://www.sacred-texts.com/jai/su1/su107.htm", "Acaranga Sutra – Book 1, Lecture 7"),
-            ("https://www.sacred-texts.com/jai/su1/su108.htm", "Acaranga Sutra – Book 1, Lecture 8"),
-            ("https://www.sacred-texts.com/jai/su1/su109.htm", "Acaranga Sutra – Book 1, Lecture 9"),
-            ("https://www.sacred-texts.com/jai/su1/su201.htm", "Acaranga Sutra – Book 2, Lecture 1"),
-            ("https://www.sacred-texts.com/jai/su1/su202.htm", "Acaranga Sutra – Book 2, Lecture 2"),
-            ("https://www.sacred-texts.com/jai/su1/su203.htm", "Acaranga Sutra – Book 2, Lecture 3"),
-            ("https://www.sacred-texts.com/jai/su1/su204.htm", "Acaranga Sutra – Book 2, Lecture 4"),
-            ("https://www.sacred-texts.com/jai/su1/su205.htm", "Acaranga Sutra – Book 2, Lecture 5"),
-            ("https://www.sacred-texts.com/jai/su1/su206.htm", "Acaranga Sutra – Book 2, Lecture 6"),
-        ],
-        "ref_fmt": "Acaranga {lec}:{v}",
+        "url":         "https://www.gutenberg.org/cache/epub/12459/pg12459.txt",
+        "name":        "Jain Sutras Part II (Uttaradhyayana + Sutrakritanga)",
+        "id_prefix":   "JainSutras2",
+        "translation": "Jain Sutras Part II (Hermann Jacobi, Sacred Books of the East, Public Domain)",
+        "book_default": "Uttaradhyayana Sutra",
+        "ref_prefix":  "Jain Sutras II",
     },
 ]
 
 
-def stable_id(prefix: str, lecture: int, verse: int) -> str:
-    return str(uuid.uuid5(uuid.NAMESPACE_DNS, f"Jainism:{prefix}:{lecture}:{verse}"))
-
-
-def strip_html(text: str) -> str:
-    return re.sub(r"<[^>]+>", " ", text).strip()
+def stable_id(prefix: str, chunk_idx: int) -> str:
+    return str(uuid.uuid5(uuid.NAMESPACE_DNS, f"Jainism:{prefix}:{chunk_idx}"))
 
 
 def clean_ws(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def parse_passages(html: str) -> list[str]:
-    """Extract verse/paragraph passages from a Sacred-Texts Jain sutra page."""
-    html = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", html, flags=re.DOTALL | re.IGNORECASE)
-    p_blocks = re.findall(r"<p[^>]*>(.*?)</p>", html, re.DOTALL | re.IGNORECASE)
+def extract_gutenberg_body(raw: str) -> str:
+    raw = raw.replace('\r\n', '\n').replace('\r', '\n')
+    start = re.search(r"\*\*\* START OF (THE|THIS) PROJECT GUTENBERG", raw, re.IGNORECASE)
+    end   = re.search(r"\*\*\* END OF (THE|THIS) PROJECT GUTENBERG", raw, re.IGNORECASE)
+    if start and end:
+        return raw[start.end():end.start()]
+    return raw
 
-    passages: list[str] = []
-    for block in p_blocks:
-        t = clean_ws(strip_html(block))
-        if len(t) < 30:
+
+def parse_into_chunks(body: str, max_words: int = MAX_WORDS) -> list[tuple[str, int, str]]:
+    """
+    Parse a Jacobi Jain sutra plain text into word-capped chunks.
+    Returns list of (book_name, chunk_idx, text).
+
+    Legge/Jacobi texts use headings like "LECTURE 1." / "BOOK I." / "CHAPTER I."
+    followed by numbered paragraphs.
+    """
+    lines = body.splitlines()
+    chunks: list[tuple[str, int, str]] = []
+
+    # Track current book section name
+    current_book   = ""
+    chunk_idx      = 0
+    buf_words: list[str] = []
+    buf_parts: list[str] = []
+
+    # Section heading patterns
+    heading_re = re.compile(
+        r"^\s*(LECTURE|BOOK|CHAPTER|PART|SUTRA|LESSON)\s+([IVXLC\d]+)\.?\s*$",
+        re.IGNORECASE,
+    )
+    # Numbered paragraph: "1. The ..." or "1) The ..."
+    numbered_re = re.compile(r"^\s*\d+[\.\)]\s+\S")
+
+    skip_kws = {
+        "gutenberg", "transcriber", "footnote", "produced by", "ebook",
+        "www.gutenberg", "online distributed", "public domain"
+    }
+
+    def flush():
+        nonlocal chunk_idx
+        if buf_parts:
+            text = clean_ws(" ".join(buf_parts))
+            if len(text) > 30:
+                chunks.append((current_book or "Jain Sutras", chunk_idx, text))
+                chunk_idx += 1
+            buf_words.clear()
+            buf_parts.clear()
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
             continue
-        lower = t.lower()
-        if any(kw in lower for kw in [
-            "sacred-texts.com", "next", "previous", "contents", "copyright",
-            "footnote", "ftn", "[pg ", "p.", "sacred books"
-        ]):
+        if any(kw in stripped.lower() for kw in skip_kws):
             continue
-        passages.append(t)
-    return passages
+
+        # Detect section heading
+        m = heading_re.match(stripped)
+        if m:
+            flush()
+            label = f"{m.group(1).title()} {m.group(2)}"
+            current_book = label
+            continue
+
+        # Detect numbered paragraph start → flush if big enough
+        if numbered_re.match(line) and buf_words:
+            words = stripped.split()
+            if len(buf_words) + len(words) > max_words:
+                flush()
+
+        words = stripped.split()
+        if len(buf_words) + len(words) > max_words and buf_words:
+            flush()
+
+        buf_words.extend(words)
+        buf_parts.append(stripped)
+
+    flush()
+    return chunks
 
 
-async def fetch_page(client: httpx.AsyncClient, sem: asyncio.Semaphore, url: str) -> str:
+async def fetch_text(client: httpx.AsyncClient, sem: asyncio.Semaphore, url: str) -> str:
     async with sem:
         for attempt in range(3):
             try:
-                r = await client.get(url, timeout=30)
+                r = await client.get(url, timeout=60)
                 if r.status_code == 200:
                     return r.text
                 if r.status_code == 404:
@@ -157,58 +163,58 @@ async def ingest_text(
     sem: asyncio.Semaphore,
     cfg: dict,
 ) -> int:
-    logger.info("Ingesting %s…", cfg["name"])
-    grand_total = 0
+    logger.info("Fetching %s…", cfg["name"])
+    raw = await fetch_text(http, sem, cfg["url"])
+    if not raw:
+        logger.error("Could not fetch %s", cfg["name"])
+        return 0
 
-    for lec_idx, (url, book_name) in enumerate(cfg["pages"], start=1):
-        html = await fetch_page(http, sem, url)
-        if not html:
-            logger.warning("  No content for lecture %d", lec_idx)
-            continue
+    body   = extract_gutenberg_body(raw)
+    chunks = parse_into_chunks(body)
 
-        passages = parse_passages(html)
-        if not passages:
-            logger.warning("  No passages for lecture %d", lec_idx)
-            continue
+    if not chunks:
+        logger.warning("No chunks parsed for %s", cfg["name"])
+        return 0
 
-        verses = []
-        for v_idx, text in enumerate(passages, start=1):
-            verses.append({
-                "religion":    RELIGION,
-                "text":        text,
-                "translation": cfg["translation"],
-                "book":        book_name,
-                "chapter":     lec_idx,
-                "verse":       v_idx,
-                "reference":   cfg["ref_fmt"].format(lec=lec_idx, v=v_idx),
-                "source_url":  url,
-            })
+    logger.info("  %s: %d chunks parsed", cfg["name"], len(chunks))
 
-        for i in range(0, len(verses), BATCH_SIZE):
-            batch      = verses[i : i + BATCH_SIZE]
-            embeddings = await embed_texts([v["text"] for v in batch], batch_size=BATCH_SIZE)
-            points = [
-                PointStruct(
-                    id=stable_id(cfg["id_prefix"], v["chapter"], v["verse"]),
-                    vector=emb,
-                    payload=v,
-                )
-                for v, emb in zip(batch, embeddings)
-            ]
-            client_q.upsert(collection_name=settings.qdrant_collection, points=points)
-            grand_total += len(points)
+    verses = [
+        {
+            "religion":    RELIGION,
+            "text":        text,
+            "translation": cfg["translation"],
+            "book":        book_name,
+            "chapter":     None,
+            "verse":       chunk_idx + 1,
+            "reference":   f"{cfg['ref_prefix']} {chunk_idx + 1}",
+            "source_url":  cfg["url"],
+        }
+        for book_name, chunk_idx, text in chunks
+    ]
 
-        logger.info("  Lecture %d (%s): %d passages", lec_idx, book_name.split("–")[-1].strip(), len(verses))
-        await asyncio.sleep(0.5)
+    total = 0
+    for i in range(0, len(verses), BATCH_SIZE):
+        batch      = verses[i : i + BATCH_SIZE]
+        embeddings = await embed_texts([v["text"] for v in batch], batch_size=BATCH_SIZE)
+        points = [
+            PointStruct(
+                id=stable_id(cfg["id_prefix"], v["verse"]),
+                vector=emb,
+                payload=v,
+            )
+            for v, emb in zip(batch, embeddings)
+        ]
+        client_q.upsert(collection_name=settings.qdrant_collection, points=points)
+        total += len(points)
 
-    logger.info("%s complete: %d passages", cfg["name"], grand_total)
-    return grand_total
+    logger.info("  %s: %d chunks ingested", cfg["name"], total)
+    return total
 
 
 async def ingest_jainism():
-    settings = get_settings()
-    client_q = QdrantClient(host=settings.qdrant_host, port=settings.qdrant_port, timeout=60)
-    sem      = asyncio.Semaphore(3)
+    settings    = get_settings()
+    client_q    = QdrantClient(host=settings.qdrant_host, port=settings.qdrant_port, timeout=60)
+    sem         = asyncio.Semaphore(4)
     grand_total = 0
 
     async with httpx.AsyncClient(

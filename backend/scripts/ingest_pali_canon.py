@@ -40,7 +40,7 @@ TRANSLATION = "Bhikkhu Sujato (CC0, SuttaCentral)"
 BATCH_SIZE  = 20
 MAX_WORDS   = 200   # target words per chunk
 
-SC_RAW = "https://raw.githubusercontent.com/suttacentral/sc-data/master/sc_bilara_data/translation/en/sujato/sutta"
+SC_RAW = "https://raw.githubusercontent.com/suttacentral/sc-data/main/sc_bilara_data/translation/en/sujato/sutta"
 GH_API = "https://api.github.com/repos/suttacentral/sc-data/contents/sc_bilara_data/translation/en/sujato/sutta"
 
 MN_VAGGAS = {
@@ -202,7 +202,7 @@ async def ingest_mn(client_q: QdrantClient, settings) -> int:
 
     async with httpx.AsyncClient() as http:
         for n in range(1, 153):
-            url  = f"{SC_RAW}/mn/mn{n}/mn{n}_translation-en-sujato.json"
+            url  = f"{SC_RAW}/mn/mn{n}_translation-en-sujato.json"
             data = await fetch_raw(http, sem, url)
             if not data:
                 logger.warning("MN %d not found — skipping", n)
