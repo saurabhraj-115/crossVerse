@@ -15,27 +15,25 @@ _sync_client: QdrantClient | None = None
 _async_client: AsyncQdrantClient | None = None
 
 
+def _client_kwargs() -> dict:
+    """Return kwargs for QdrantClient — URL if set, otherwise host+port."""
+    settings = get_settings()
+    if settings.qdrant_url:
+        return {"url": settings.qdrant_url, "timeout": 30}
+    return {"host": settings.qdrant_host, "port": settings.qdrant_port, "timeout": 30}
+
+
 def get_qdrant_sync() -> QdrantClient:
     global _sync_client
     if _sync_client is None:
-        settings = get_settings()
-        _sync_client = QdrantClient(
-            host=settings.qdrant_host,
-            port=settings.qdrant_port,
-            timeout=30,
-        )
+        _sync_client = QdrantClient(**_client_kwargs())
     return _sync_client
 
 
 def get_qdrant() -> AsyncQdrantClient:
     global _async_client
     if _async_client is None:
-        settings = get_settings()
-        _async_client = AsyncQdrantClient(
-            host=settings.qdrant_host,
-            port=settings.qdrant_port,
-            timeout=30,
-        )
+        _async_client = AsyncQdrantClient(**_client_kwargs())
     return _async_client
 
 
