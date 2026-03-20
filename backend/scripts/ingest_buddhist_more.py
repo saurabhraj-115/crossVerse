@@ -1,9 +1,12 @@
 """
 Ingest additional Buddhist texts from SuttaCentral sc-data (Bhikkhu Sujato, CC0):
   - Digha Nikaya  (DN 1–34)   ~long suttas, 200-word chunks
-  - Sutta Nipata  (Snp)       discovered via GitHub API
+  - Sutta Nipata  (Snp)       discovered via GitHub API (nested vagga subdirs)
   - Theragatha    (Thag)      discovered via GitHub API
   - Therigatha    (Thig)      discovered via GitHub API
+
+Plus Mahayana texts from Project Gutenberg:
+  - The Diamond Sutra (PG #64623, Price/Wong translation)
 
 Re-running is safe — deterministic UUIDs, upsert only.
 """
@@ -234,18 +237,32 @@ async def ingest_kn_collection(
     total   = 0
 
     async with httpx.AsyncClient() as http:
-        entries = await github_list(http, api_sem, gh_path)
+        top_entries = await github_list(http, api_sem, gh_path)
         await asyncio.sleep(1.5)
 
         file_urls: list[tuple[str, str]] = []
-        for entry in entries:
-            fname = entry.get("name", "")
-            if not fname.endswith("_translation-en-sujato.json"):
-                continue
-            sutta_id_raw = fname.split("_translation")[0]
-            dl_url       = entry.get("download_url", "")
-            if dl_url:
-                file_urls.append((sutta_id_raw, dl_url))
+
+        for entry in top_entries:
+            if entry.get("type") == "dir":
+                # One level of subdirectory (e.g. Sutta Nipata's vagga1-5)
+                subdir_entries = await github_list(http, api_sem, f"{gh_path}/{entry['name']}")
+                await asyncio.sleep(1.0)
+                for sub in subdir_entries:
+                    fname = sub.get("name", "")
+                    if not fname.endswith("_translation-en-sujato.json"):
+                        continue
+                    sutta_id_raw = fname.split("_translation")[0]
+                    dl_url = sub.get("download_url", "")
+                    if dl_url:
+                        file_urls.append((sutta_id_raw, dl_url))
+            else:
+                fname = entry.get("name", "")
+                if not fname.endswith("_translation-en-sujato.json"):
+                    continue
+                sutta_id_raw = fname.split("_translation")[0]
+                dl_url       = entry.get("download_url", "")
+                if dl_url:
+                    file_urls.append((sutta_id_raw, dl_url))
 
         logger.info("%s: discovered %d translation files", book_name, len(file_urls))
 
@@ -276,6 +293,106 @@ async def ingest_kn_collection(
 
 
 # ---------------------------------------------------------------------------
+# Diamond Sutra (Project Gutenberg #64623)
+# ---------------------------------------------------------------------------
+
+DIAMOND_SUTRA_URL = "https://www.gutenberg.org/cache/epub/64623/pg64623.txt"
+DIAMOND_TRANSLATION = "The Diamond Sutra (A.F. Price & Wong Mou-lam translation, Public Domain)"
+
+
+def _extract_gutenberg_body(raw: str) -> str:
+    raw = raw.replace("\r\n", "\n").replace("\r", "\n")
+    start = re.search(r"\*\*\* START OF (THE|THIS) PROJECT GUTENBERG", raw, re.IGNORECASE)
+    end   = re.search(r"\*\*\* END OF (THE|THIS) PROJECT GUTENBERG", raw, re.IGNORECASE)
+    if start and end:
+        return raw[start.end():end.start()]
+    return raw
+
+
+async def ingest_diamond_sutra(client_q: QdrantClient, settings) -> int:
+    logger.info("=== Diamond Sutra (PG #64623) ===")
+    skip_kws = {"gutenberg", "produced by", "www.gutenberg", "ebook", "transcriber"}
+
+    async with httpx.AsyncClient(headers={"User-Agent": "CrossVerse-Ingestion/1.0"},
+                                  follow_redirects=True, timeout=60) as http:
+        for attempt in range(3):
+            try:
+                r = await http.get(DIAMOND_SUTRA_URL)
+                if r.status_code == 200:
+                    raw = r.text
+                    break
+            except Exception as e:
+                logger.warning("Diamond Sutra attempt %d: %s", attempt + 1, e)
+                await asyncio.sleep(2 ** attempt)
+        else:
+            logger.error("Could not fetch Diamond Sutra")
+            return 0
+
+    body  = _extract_gutenberg_body(raw)
+    lines = body.splitlines()
+
+    # Split into ~200-word chunks, respecting section breaks
+    section_re = re.compile(r"^(CHAPTER|SECTION|PART)\s+[IVXLC\d]+", re.IGNORECASE)
+    chunks: list[dict] = []
+    buf_words: list[str] = []
+    buf_parts: list[str] = []
+    chunk_idx = 0
+
+    def flush():
+        nonlocal chunk_idx
+        if buf_parts:
+            text = re.sub(r"\s+", " ", " ".join(buf_parts)).strip()
+            if len(text.split()) >= 8:
+                chunks.append({
+                    "religion":    RELIGION,
+                    "text":        text,
+                    "translation": DIAMOND_TRANSLATION,
+                    "book":        "The Diamond Sutra",
+                    "chapter":     None,
+                    "verse":       chunk_idx + 1,
+                    "reference":   f"Diamond Sutra {chunk_idx + 1}",
+                    "source_url":  DIAMOND_SUTRA_URL,
+                    "_id": str(uuid.uuid5(uuid.NAMESPACE_DNS,
+                                          f"Buddhism:DiamondSutra:{chunk_idx}")),
+                })
+                chunk_idx += 1
+            buf_words.clear()
+            buf_parts.clear()
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if any(kw in stripped.lower() for kw in skip_kws):
+            continue
+        if section_re.match(stripped):
+            flush()
+            continue
+        words = stripped.split()
+        if len(buf_words) + len(words) > 200 and buf_words:
+            flush()
+        buf_words.extend(words)
+        buf_parts.append(stripped)
+
+    flush()
+    logger.info("Diamond Sutra: %d chunks", len(chunks))
+
+    total = 0
+    for i in range(0, len(chunks), BATCH_SIZE):
+        batch = chunks[i : i + BATCH_SIZE]
+        embs  = await embed_texts([c["text"] for c in batch], batch_size=BATCH_SIZE)
+        points = [
+            PointStruct(id=c.pop("_id"), vector=e, payload=c)
+            for c, e in zip(batch, embs)
+        ]
+        client_q.upsert(collection_name=settings.qdrant_collection, points=points)
+        total += len(points)
+
+    logger.info("Diamond Sutra complete: %d chunks ingested", total)
+    return total
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -283,15 +400,16 @@ async def ingest_buddhist_more():
     settings = get_settings()
     client_q = QdrantClient(host=settings.qdrant_host, port=settings.qdrant_port, timeout=60)
 
-    dn_total   = await ingest_dn(client_q, settings)
-    snp_total  = await ingest_kn_collection(client_q, settings, "kn/snp",  "Sutta Nipata", "Snp")
-    thag_total = await ingest_kn_collection(client_q, settings, "kn/thag", "Theragatha",   "Thag")
-    thig_total = await ingest_kn_collection(client_q, settings, "kn/thig", "Therigatha",   "Thig")
+    dn_total      = await ingest_dn(client_q, settings)
+    snp_total     = await ingest_kn_collection(client_q, settings, "kn/snp",  "Sutta Nipata", "Snp")
+    thag_total    = await ingest_kn_collection(client_q, settings, "kn/thag", "Theragatha",   "Thag")
+    thig_total    = await ingest_kn_collection(client_q, settings, "kn/thig", "Therigatha",   "Thig")
+    diamond_total = await ingest_diamond_sutra(client_q, settings)
 
     logger.info(
-        "Buddhist More ingestion complete. DN=%d Snp=%d Thag=%d Thig=%d  Total=%d",
-        dn_total, snp_total, thag_total, thig_total,
-        dn_total + snp_total + thag_total + thig_total,
+        "Buddhist More ingestion complete. DN=%d Snp=%d Thag=%d Thig=%d Diamond=%d  Total=%d",
+        dn_total, snp_total, thag_total, thig_total, diamond_total,
+        dn_total + snp_total + thag_total + thig_total + diamond_total,
     )
 
 

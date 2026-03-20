@@ -54,6 +54,13 @@ TEXTS = [
         "translation": "Gleanings from the Writings of Bahá'u'lláh (Public Domain)",
         "book":        "Gleanings from the Writings of Bahá'u'lláh",
     },
+    {
+        "url":         "https://www.gutenberg.org/cache/epub/16697/pg16697.txt",
+        "name":        "Epistle to the Son of the Wolf",
+        "id_prefix":   "EpistleSonWolf",
+        "translation": "Epistle to the Son of the Wolf (Bahá'u'lláh, Public Domain)",
+        "book":        "Epistle to the Son of the Wolf",
+    },
 ]
 
 _SKIP_KWS = {
