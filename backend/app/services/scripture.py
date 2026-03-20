@@ -17,6 +17,8 @@ RELIGION_COLORS = {
     "Zoroastrianism": "#D97706",
     "Confucianism": "#78716C",
     "Taoism": "#059669",
+    "Bahai": "#9333EA",
+    "Shinto": "#EC4899",
 }
 
 SUPPORTED_RELIGIONS = list(RELIGION_COLORS.keys())

@@ -38,6 +38,13 @@ from scripts.ingest_confucianism import ingest_confucianism
 from scripts.ingest_taoism import ingest_taoism
 from scripts.ingest_jainism import ingest_jainism
 from scripts.ingest_zoroastrianism import ingest_zoroastrianism
+from scripts.ingest_hadith_more import ingest_hadith_more
+from scripts.ingest_talmud import ingest_talmud
+from scripts.ingest_buddhist_more import ingest_buddhist_more
+from scripts.ingest_apocrypha import ingest_apocrypha
+from scripts.ingest_church_fathers import ingest_church_fathers
+from scripts.ingest_bahai import ingest_bahai
+from scripts.ingest_shinto import ingest_shinto
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,13 +79,26 @@ INGESTION_STEPS = [
     ("Pirkei Avot – 6 chapters (Sefaria)", ingest_pirkei_avot),
     ("Mishnah – 62 tractates / 6 orders (Sefaria)", ingest_mishnah),
     # Confucianism
-    ("Analects of Confucius + Mencius (James Legge)", ingest_confucianism),
+    ("Analects of Confucius + Great Learning (James Legge)", ingest_confucianism),
     # Taoism
-    ("Tao Te Ching + Zhuangzi inner chapters (James Legge)", ingest_taoism),
+    ("Tao Te Ching (James Legge)", ingest_taoism),
     # Jainism
-    ("Uttaradhyayana Sutra + Acaranga Sutra (Hermann Jacobi)", ingest_jainism),
+    ("Uttaradhyayana + Sutrakritanga (Hermann Jacobi)", ingest_jainism),
     # Zoroastrianism
-    ("Gathas of Zarathustra + Vendidad (Mills & Darmesteter)", ingest_zoroastrianism),
+    ("Vendidad + Zend-Avesta (Darmesteter)", ingest_zoroastrianism),
+    # Islam — additional Hadith
+    ("Hadith – Tirmidhi, Ibn Majah, Riyad as-Salihin", ingest_hadith_more),
+    # Judaism — Talmud
+    ("Babylonian Talmud – key tractates (Sefaria)", ingest_talmud),
+    # Buddhism — additional Nikayas
+    ("Buddhist texts – DN, Sutta Nipata, Theragatha, Therigatha", ingest_buddhist_more),
+    # Christianity — Apocrypha + Church Fathers
+    ("Christian Apocrypha (KJV Apocrypha, Gutenberg)", ingest_apocrypha),
+    ("Early Church Fathers – Clement, Ignatius, Justin Martyr", ingest_church_fathers),
+    # Bahá'í
+    ("Bahá'í – Hidden Words, Seven Valleys, Gleanings", ingest_bahai),
+    # Shinto
+    ("Shinto – Kojiki + Nihongi (Chamberlain/Aston)", ingest_shinto),
 ]
 
 

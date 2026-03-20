@@ -21,7 +21,9 @@ export type Religion =
   | 'Jainism'
   | 'Zoroastrianism'
   | 'Confucianism'
-  | 'Taoism';
+  | 'Taoism'
+  | 'Bahai'
+  | 'Shinto';
 
 export const ALL_RELIGIONS: Religion[] = [
   'Christianity',
@@ -34,6 +36,8 @@ export const ALL_RELIGIONS: Religion[] = [
   'Zoroastrianism',
   'Confucianism',
   'Taoism',
+  'Bahai',
+  'Shinto',
 ];
 
 export const RELIGION_COLORS: Record<Religion, string> = {
@@ -47,6 +51,8 @@ export const RELIGION_COLORS: Record<Religion, string> = {
   Zoroastrianism: '#D97706',
   Confucianism: '#78716C',
   Taoism: '#059669',
+  Bahai: '#9333EA',
+  Shinto: '#EC4899',
 };
 
 export const RELIGION_BG: Record<Religion, string> = {
@@ -60,6 +66,8 @@ export const RELIGION_BG: Record<Religion, string> = {
   Zoroastrianism: 'bg-amber-100 text-amber-800 border-amber-300',
   Confucianism: 'bg-stone-100 text-stone-800 border-stone-200',
   Taoism: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+  Bahai: 'bg-purple-100 text-purple-900 border-purple-300',
+  Shinto: 'bg-pink-100 text-pink-800 border-pink-200',
 };
 
 export const RELIGION_EMOJI: Record<Religion, string> = {
@@ -73,6 +81,8 @@ export const RELIGION_EMOJI: Record<Religion, string> = {
   Zoroastrianism: '🔥',
   Confucianism: '📖',
   Taoism: '☯️',
+  Bahai: '✦',
+  Shinto: '⛩️',
 };
 
 export type QueryMode = 'simple' | 'scholar' | 'child';
