@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
+    # If set, overrides qdrant_host+port (used for tunnel/cloud connections)
+    qdrant_url: str = ""
     qdrant_collection: str = "scriptures"
     embedding_model: str = "text-embedding-3-small"
     llm_model: str = "claude-sonnet-4-6"

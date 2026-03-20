@@ -5,9 +5,11 @@ primary_region = "iad"
   dockerfile = "Dockerfile"
 
 [env]
-  # Qdrant is on Fly's private network — no auth, not exposed publicly
-  QDRANT_HOST = "crossverse-qdrant.internal"
-  QDRANT_PORT = "6333"
+  # QDRANT_URL is set via `fly secrets set` — not hardcoded here
+  # Options:
+  #   Laptop tunnel:  QDRANT_URL = "https://your-tunnel.trycloudflare.com"
+  #   Fly private:    QDRANT_HOST = "crossverse-qdrant.internal", QDRANT_PORT = "6333"
+  #   Qdrant Cloud:   QDRANT_URL = "https://xyz.us-east-1-0.aws.cloud.qdrant.io"
 
 [http_service]
   internal_port = 8000
