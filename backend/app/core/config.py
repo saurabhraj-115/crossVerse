@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     qdrant_port: int = 6333
     # If set, overrides qdrant_host+port (used for tunnel/cloud connections)
     qdrant_url: str = ""
+    qdrant_api_key: str = ""
     qdrant_collection: str = "scriptures"
     embedding_model: str = "text-embedding-3-small"
     llm_model: str = "claude-sonnet-4-6"
