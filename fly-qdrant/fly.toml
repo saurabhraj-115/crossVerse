@@ -1,0 +1,29 @@
+app = "crossverse-qdrant"
+primary_region = "iad"
+
+# Use the official Qdrant image directly — no custom Dockerfile needed
+[build]
+  image = "qdrant/qdrant:latest"
+
+[env]
+  QDRANT__STORAGE__STORAGE_PATH = "/qdrant/storage"
+  # Disable telemetry
+  QDRANT__TELEMETRY_DISABLED = "true"
+
+# Persistent volume for vector data (created separately with `fly volumes create`)
+[[mounts]]
+  source = "qdrant_data"
+  destination = "/qdrant/storage"
+
+# Qdrant is NOT exposed publicly — only reachable via Fly private network
+# (crossverse-backend talks to it via crossverse-qdrant.internal:6333)
+[[services]]
+  internal_port = 6333
+  protocol = "tcp"
+  # No [[services.ports]] = not publicly accessible
+
+[[vm]]
+  # 2GB RAM is the minimum for 176k vectors comfortably
+  memory = "2gb"
+  cpu_kind = "performance"
+  cpus = 1
