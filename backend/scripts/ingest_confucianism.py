@@ -50,11 +50,25 @@ GUTENBERG_URLS = [
     },
     {
         "url":         "https://www.gutenberg.org/cache/epub/4096/pg4096.txt",
+        "url_fallback": "https://gutenberg.pglaf.org/4/0/9/4096/4096-0.txt",
         "name":        "The Doctrine of the Mean",
         "id_prefix":   "DocMean",
         "translation": "The Doctrine of the Mean (James Legge, Public Domain)",
         "book_base":   "The Doctrine of the Mean",
         "ref_prefix":  "Doctrine of the Mean",
+    },
+    {
+        "url":         "https://gutenberg.pglaf.org/1/0/0/5/10056/10056-0.txt",
+        "name":        "The Sayings of Mencius",
+        "id_prefix":   "Mencius",
+        "translation": "The Works of Mencius (James Legge, Public Domain)",
+        "book_base":   "Mencius",
+        "ref_prefix":  "Mencius",
+        # Extract only the Mencius section from this combined-texts file
+        "section_start": "THE SAYINGS OF MENCIUS",
+        "section_end":   "THE SHI-KING",
+        # Mencius uses prose paragraphs, not numbered verses
+        "prose_mode": True,
     },
 ]
 
@@ -139,6 +153,61 @@ def parse_into_passages(body: str, max_words: int = 150) -> list[tuple[int, int,
     return passages
 
 
+def parse_prose_chunks(body: str, max_words: int = 150) -> list[tuple[int, int, str]]:
+    """
+    Parse a prose text (no numbered verses) into ~max_words chunks.
+    Splits on blank lines, word-caps at max_words.
+    Returns list of (chapter_idx, verse_idx, text).
+    """
+    skip_kws = {"gutenberg", "project gutenberg", "transcriber", "produced by",
+                "www.gutenberg", "ebook"}
+
+    paragraphs = re.split(r"\n{2,}", body)
+    chapter_idx = 0
+    verse_idx   = 0
+    passages: list[tuple[int, int, str]] = []
+    buf_words: list[str] = []
+    buf_parts: list[str] = []
+
+    def flush():
+        nonlocal verse_idx
+        text = clean_ws(" ".join(buf_parts))
+        if text and len(text.split()) >= 8:
+            verse_idx += 1
+            passages.append((max(chapter_idx, 1), verse_idx, text))
+        buf_words.clear()
+        buf_parts.clear()
+
+    heading_re = re.compile(r"^(BOOK|CHAPTER|PART)\s+[IVXLC\d]+", re.IGNORECASE)
+
+    for para in paragraphs:
+        stripped = para.strip()
+        if not stripped:
+            continue
+        if any(kw in stripped.lower() for kw in skip_kws):
+            continue
+        if heading_re.match(stripped):
+            flush()
+            chapter_idx += 1
+            verse_idx = 0
+            continue
+
+        # Remove footnote references like [1] [2]
+        stripped = re.sub(r"\[\d+\]", "", stripped)
+        stripped = clean_ws(stripped)
+        if not stripped:
+            continue
+
+        words = stripped.split()
+        if len(buf_words) + len(words) > max_words and buf_words:
+            flush()
+        buf_words.extend(words)
+        buf_parts.append(stripped)
+
+    flush()
+    return passages
+
+
 async def fetch_text(client: httpx.AsyncClient, sem: asyncio.Semaphore, url: str) -> str:
     async with sem:
         for attempt in range(3):
@@ -164,12 +233,29 @@ async def ingest_text(
 ) -> int:
     logger.info("Fetching %s…", cfg["name"])
     raw = await fetch_text(http, sem, cfg["url"])
+    if not raw and cfg.get("url_fallback"):
+        raw = await fetch_text(http, sem, cfg["url_fallback"])
     if not raw:
         logger.error("Could not fetch %s", cfg["name"])
         return 0
 
-    body     = extract_gutenberg_body(raw)
-    passages = parse_into_passages(body)
+    body = extract_gutenberg_body(raw)
+
+    # If a section_start/section_end is specified, extract only that slice.
+    # Use the LAST occurrence of section_start to skip TOC entries.
+    if cfg.get("section_start"):
+        matches = list(re.finditer(re.escape(cfg["section_start"]), body, re.IGNORECASE))
+        if matches:
+            body = body[matches[-1].start():]
+    if cfg.get("section_end"):
+        matches = list(re.finditer(re.escape(cfg["section_end"]), body, re.IGNORECASE))
+        if matches:
+            body = body[:matches[-1].start()]
+
+    if cfg.get("prose_mode"):
+        passages = parse_prose_chunks(body)
+    else:
+        passages = parse_into_passages(body)
 
     if not passages:
         logger.warning("No passages parsed for %s", cfg["name"])
