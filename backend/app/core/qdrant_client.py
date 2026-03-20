@@ -19,8 +19,11 @@ def _client_kwargs() -> dict:
     """Return kwargs for QdrantClient — URL if set, otherwise host+port."""
     settings = get_settings()
     if settings.qdrant_url:
-        return {"url": settings.qdrant_url, "timeout": 30}
-    return {"host": settings.qdrant_host, "port": settings.qdrant_port, "timeout": 30}
+        kwargs: dict = {"url": settings.qdrant_url, "timeout": 30, "prefer_grpc": False}
+        if settings.qdrant_api_key:
+            kwargs["api_key"] = settings.qdrant_api_key
+        return kwargs
+    return {"host": settings.qdrant_host, "port": settings.qdrant_port, "timeout": 30, "prefer_grpc": False}
 
 
 def get_qdrant_sync() -> QdrantClient:
