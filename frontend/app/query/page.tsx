@@ -6,10 +6,15 @@ export const metadata: Metadata = {
   description: 'Ask any question and receive answers grounded exclusively in sacred scripture with citations.',
 };
 
-export default function QueryPage() {
+export default function QueryPage({
+  searchParams,
+}: {
+  searchParams: { q?: string };
+}) {
+  const initialQuestion = searchParams.q ? decodeURIComponent(searchParams.q) : undefined;
   return (
     <div className="flex h-[calc(100vh-57px)] flex-col">
-      <QueryChat />
+      <QueryChat initialQuestion={initialQuestion} />
     </div>
   );
 }

@@ -90,7 +90,7 @@ function detectReligions(text: string): Religion[] {
   return Array.from(detected);
 }
 
-export default function QueryChat() {
+export default function QueryChat({ initialQuestion }: { initialQuestion?: string } = {}) {
   const { globalReligions } = useSettings();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -103,10 +103,19 @@ export default function QueryChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
+  const didAutoSend = useRef(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (initialQuestion && !didAutoSend.current) {
+      didAutoSend.current = true;
+      sendMessage(initialQuestion);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleReligion = (religion: Religion) => {
     setSelectedReligions((prev) =>
