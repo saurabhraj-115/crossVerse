@@ -16,7 +16,7 @@ from app.models.schemas import (
 )
 from app.services.embeddings import embed_query
 from app.services.rag import _search_qdrant
-from app.core.llm import chat_complete
+from app.core.llm import chat_complete, HAIKU
 from app.services.scripture import SUPPORTED_RELIGIONS
 
 logger = logging.getLogger(__name__)
@@ -183,7 +183,7 @@ async def analyze_fingerprint(request: FingerprintAnalyzeRequest) -> Fingerprint
             {"role": "user", "content": user_message},
         ]
 
-        raw = await chat_complete(messages, temperature=0.2, max_tokens=400)
+        raw = await chat_complete(messages, temperature=0.2, max_tokens=400, model=HAIKU)
 
         # Parse JSON response
         m = re.search(r"\{.*\}", raw, re.DOTALL)

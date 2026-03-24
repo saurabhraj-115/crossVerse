@@ -18,7 +18,7 @@ from app.models.schemas import (
 from app.services.embeddings import embed_query
 from app.services.rag import _search_qdrant
 from app.services.scripture import build_context_block, SUPPORTED_RELIGIONS
-from app.core.llm import chat_complete
+from app.core.llm import chat_complete, HAIKU
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -93,7 +93,7 @@ async def find_universal_truth(request: UniversalRequest) -> UniversalResponse:
             {"role": "user", "content": user_message},
         ]
 
-        raw = await chat_complete(messages, temperature=0.3, max_tokens=600)
+        raw = await chat_complete(messages, temperature=0.3, max_tokens=600, model=HAIKU)
 
         match = re.search(r"\{.*\}", raw, re.DOTALL)
         if not match:

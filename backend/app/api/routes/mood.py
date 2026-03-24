@@ -10,7 +10,7 @@ from app.models.schemas import MoodRequest, MoodResponse, ScriptureChunk
 from app.services.embeddings import embed_query
 from app.services.rag import _search_qdrant
 from app.services.scripture import build_context_block, SUPPORTED_RELIGIONS
-from app.core.llm import chat_complete
+from app.core.llm import chat_complete, HAIKU
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -85,7 +85,7 @@ async def mood_scripture(request: MoodRequest) -> MoodResponse:
             {"role": "user", "content": user_message},
         ]
 
-        message = await chat_complete(messages, temperature=0.5, max_tokens=300)
+        message = await chat_complete(messages, temperature=0.5, max_tokens=300, model=HAIKU)
 
         response = MoodResponse(
             mood=mood,

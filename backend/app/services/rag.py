@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 from qdrant_client.models import Filter, FieldCondition, MatchAny
 
 from app.core.config import get_settings
-from app.core.llm import chat_complete
+from app.core.llm import chat_complete, SONNET, HAIKU
 from app.core.qdrant_client import get_qdrant
 from app.models.schemas import QueryResponse, ScriptureChunk
 from app.services.embeddings import embed_query
@@ -130,7 +130,8 @@ async def query_scriptures(
 
     # 5. Generate answer
     mode_tokens = {"scholar": 2048, "simple": 500, "child": 300}
-    answer = await chat_complete(messages, temperature=0.2, max_tokens=mode_tokens.get(mode, 500))
+    mode_model = {"scholar": SONNET, "simple": HAIKU, "child": HAIKU}
+    answer = await chat_complete(messages, temperature=0.2, max_tokens=mode_tokens.get(mode, 500), model=mode_model.get(mode, HAIKU))
 
     return QueryResponse(
         answer=answer,
@@ -200,6 +201,7 @@ async def find_contradictions(
         [{"role": "system", "content": system}, {"role": "user", "content": user}],
         temperature=0.3,
         max_tokens=500,
+        model=SONNET,
     )
 
     import json
