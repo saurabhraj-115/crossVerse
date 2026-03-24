@@ -6,6 +6,7 @@ import { ArrowRight, BookOpen, Download, RefreshCw, Send, Share2, Sparkles, X } 
 import Link from 'next/link';
 import type { DailyResponse, DailyPerspective, Religion } from '@/lib/types';
 import { RELIGION_COLORS, RELIGION_EMOJI, ALL_RELIGIONS } from '@/lib/types';
+import { Analytics } from '@/lib/analytics';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -188,6 +189,7 @@ function CardModal({ religion, perspective, theme, onClose }: CardModalProps) {
 
   const handleDownload = async () => {
     setSharing(true);
+    Analytics.shareCardDownloaded(religion, theme);
     try {
       const blob = await generateShareCard(religion, color, emoji, theme, perspective.reflection, firstRef);
       const url = URL.createObjectURL(blob);
@@ -203,6 +205,7 @@ function CardModal({ religion, perspective, theme, onClose }: CardModalProps) {
 
   const handleWhatsApp = async () => {
     setSharing(true);
+    Analytics.whatsappShareClicked(religion, theme);
     try {
       const blob = await generateShareCard(religion, color, emoji, theme, perspective.reflection, firstRef);
       const file = new File([blob], `crossverse-${religion.toLowerCase()}.png`, { type: 'image/png' });
@@ -429,6 +432,7 @@ export default function LivingHero() {
   const handleAsk = (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim()) return;
+    Analytics.questionAsked(question.trim(), 'simple', []);
     router.push(`/query?q=${encodeURIComponent(question.trim())}`);
   };
 
@@ -452,6 +456,7 @@ export default function LivingHero() {
         const msg = JSON.parse(e.data);
         if (msg.type === 'theme') {
           setStreamTheme({ theme: msg.theme, date: msg.date, headline: msg.headline });
+          Analytics.dailyThemeLoaded(msg.theme, msg.headline ? 'news' : 'fallback');
           setLoading(false); // header is ready — drop the skeleton bars
         } else if (msg.type === 'card') {
           setPerspectives((prev) => ({ ...prev, [msg.religion]: msg.perspective }));
@@ -582,7 +587,7 @@ export default function LivingHero() {
             ) : (
               <>
                 {dailyForCards && Object.keys(perspectives).length > 0 && (
-                  <CardGrid daily={dailyForCards} onCardClick={setActiveCard} />
+                  <CardGrid daily={dailyForCards} onCardClick={(rel) => { Analytics.dailyCardOpened(rel, streamTheme!.theme); setActiveCard(rel); }} />
                 )}
                 {!done && streamTheme && (
                   <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -604,7 +609,7 @@ export default function LivingHero() {
               Find Your Tradition <ArrowRight size={15} />
             </Link>
             <button
-              onClick={() => fetchDaily(true)}
+              onClick={() => { Analytics.dailyRefreshed(); fetchDaily(true); }}
               disabled={refreshing}
               className="flex items-center gap-2 rounded-xl border border-indigo-200 bg-white text-indigo-700 hover:bg-indigo-50 dark:border-white/20 dark:bg-white/5 dark:text-white/80 dark:hover:bg-white/10 px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50"
             >
