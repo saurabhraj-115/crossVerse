@@ -2,11 +2,138 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, BookOpen, RefreshCw, Send, Sparkles, X } from 'lucide-react';
+import { ArrowRight, BookOpen, Download, RefreshCw, Send, Share2, Sparkles, X } from 'lucide-react';
 import Link from 'next/link';
 import { getDailyBriefing } from '@/lib/api';
 import type { DailyResponse, DailyPerspective, Religion } from '@/lib/types';
 import { RELIGION_COLORS, RELIGION_EMOJI, ALL_RELIGIONS } from '@/lib/types';
+
+// ---------------------------------------------------------------------------
+// Share card canvas generator
+// ---------------------------------------------------------------------------
+function wrapCanvasText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+): number {
+  const words = text.split(' ');
+  let line = '';
+  let curY = y;
+  for (const word of words) {
+    const test = line + word + ' ';
+    if (ctx.measureText(test).width > maxWidth && line) {
+      ctx.fillText(line.trim(), x, curY);
+      line = word + ' ';
+      curY += lineHeight;
+    } else {
+      line = test;
+    }
+  }
+  if (line.trim()) ctx.fillText(line.trim(), x, curY);
+  return curY;
+}
+
+async function generateShareCard(
+  religion: string,
+  color: string,
+  emoji: string,
+  theme: string,
+  reflection: string,
+  reference: string,
+): Promise<Blob> {
+  return new Promise((resolve) => {
+    const W = 1080, H = 1350;
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d')!;
+
+    // Background
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#06071a');
+    bg.addColorStop(1, '#0e0f2e');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Colored glow blob top-right
+    const glow = ctx.createRadialGradient(W * 0.8, H * 0.1, 0, W * 0.8, H * 0.1, 400);
+    glow.addColorStop(0, `${color}30`);
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    // Top color bar
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, W, 10);
+
+    // "LIVE TODAY" badge
+    ctx.fillStyle = `${color}22`;
+    const badgeW = 200, badgeH = 44, badgeX = W / 2 - badgeW / 2, badgeY = 60;
+    ctx.beginPath();
+    ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 22);
+    ctx.fill();
+    ctx.font = 'bold 18px system-ui, sans-serif';
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.fillText('LIVE TODAY · CROSSVERSE', W / 2, badgeY + 28);
+
+    // Emoji
+    ctx.font = '140px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(emoji, W / 2, 290);
+
+    // Religion name
+    ctx.font = 'bold 72px system-ui, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(religion, W / 2, 390);
+
+    // "on <theme>" pill
+    const themeText = `on: ${theme}`;
+    ctx.font = '32px system-ui, sans-serif';
+    ctx.fillStyle = `${color}cc`;
+    ctx.fillText(themeText, W / 2, 450);
+
+    // Divider
+    ctx.strokeStyle = `${color}44`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(140, 490);
+    ctx.lineTo(W - 140, 490);
+    ctx.stroke();
+
+    // Reflection text
+    const truncated = reflection.length > 320
+      ? reflection.slice(0, 320).trimEnd() + '…'
+      : reflection;
+    ctx.font = 'italic 34px Georgia, serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.88)';
+    ctx.textAlign = 'center';
+    const lastY = wrapCanvasText(ctx, `"${truncated}"`, W / 2, 560, 800, 52);
+
+    // Reference
+    ctx.font = 'bold 28px system-ui, sans-serif';
+    ctx.fillStyle = `${color}cc`;
+    ctx.textAlign = 'center';
+    const refY = Math.max(lastY + 70, 980);
+    ctx.fillText(reference, W / 2, Math.min(refY, 1040));
+
+    // Bottom branding bar
+    ctx.fillStyle = `${color}18`;
+    ctx.fillRect(0, H - 110, W, 110);
+    ctx.font = 'bold 26px system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.textAlign = 'center';
+    ctx.fillText('crossverse-frontend.fly.dev', W / 2, H - 68);
+    ctx.font = '22px system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillText('AI-powered scripture exploration across 12 traditions', W / 2, H - 36);
+
+    canvas.toBlob((blob) => resolve(blob!), 'image/png');
+  });
+}
 
 const LOADING_QUOTES = [
   '"Be still and know." — Psalm 46:10',
@@ -53,7 +180,46 @@ function CardModal({ religion, perspective, theme, onClose }: CardModalProps) {
   const color = RELIGION_COLORS[religion as Religion];
   const emoji = RELIGION_EMOJI[religion as Religion];
   const [followUp, setFollowUp] = useState('');
+  const [sharing, setSharing] = useState(false);
   const backdropRef = useRef<HTMLDivElement>(null);
+
+  const firstRef = perspective.sources[0]?.reference ?? '';
+
+  const handleDownload = async () => {
+    setSharing(true);
+    try {
+      const blob = await generateShareCard(religion, color, emoji, theme, perspective.reflection, firstRef);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `crossverse-${religion.toLowerCase()}-${theme.replace(/\s+/g, '-')}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const handleWhatsApp = async () => {
+    setSharing(true);
+    try {
+      const blob = await generateShareCard(religion, color, emoji, theme, perspective.reflection, firstRef);
+      const file = new File([blob], `crossverse-${religion.toLowerCase()}.png`, { type: 'image/png' });
+      const shareText = `${emoji} ${religion} on "${theme}"\n\n"${perspective.reflection.slice(0, 200)}${perspective.reflection.length > 200 ? '…' : ''}"\n\n— ${firstRef}\n\nExplore all 12 traditions: https://crossverse-frontend.fly.dev`;
+
+      if (typeof navigator !== 'undefined' && navigator.share && (navigator as any).canShare?.({ files: [file] })) {
+        await navigator.share({
+          title: `${religion} on ${theme} — CrossVerse`,
+          text: shareText,
+          files: [file],
+        });
+      } else {
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+      }
+    } finally {
+      setSharing(false);
+    }
+  };
 
   // Close on Escape
   useEffect(() => {
@@ -96,12 +262,33 @@ function CardModal({ religion, perspective, theme, onClose }: CardModalProps) {
               <p className="text-xs capitalize" style={{ color: `${color}cc` }}>on {theme}</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white transition-colors"
-          >
-            <X size={16} />
-          </button>
+          <div className="flex items-center gap-1">
+            {/* Download */}
+            <button
+              onClick={handleDownload}
+              disabled={sharing}
+              title="Download as image"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-40"
+            >
+              <Download size={15} />
+            </button>
+            {/* WhatsApp share */}
+            <button
+              onClick={handleWhatsApp}
+              disabled={sharing}
+              title="Share on WhatsApp"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-40"
+            >
+              <Share2 size={15} />
+            </button>
+            {/* Close */}
+            <button
+              onClick={onClose}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
         {/* Scrollable body */}
