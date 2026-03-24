@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { SettingsProvider } from '@/lib/settings-context';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -33,6 +34,7 @@ export default function RootLayout({
           <SettingsProvider>
             <Navbar />
             <main className="min-h-screen">{children}</main>
+            <Footer />
           </SettingsProvider>
         </ThemeProvider>
       </body>
