@@ -2,7 +2,7 @@
 
 CrossVerse is an AI-powered platform for exploring sacred scripture across twelve world traditions. It uses RAG (Retrieval Augmented Generation) to answer questions grounded exclusively in scripture text — no opinion, no commentary, always cited.
 
-**Live:** https://crossverse-frontend.fly.dev
+**Live:** https://crossverse.fly.dev
 
 ---
 
@@ -71,7 +71,7 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across twelv
 
 The app is deployed on Fly.io:
 
-- **Frontend:** https://crossverse-frontend.fly.dev
+- **Frontend:** https://crossverse.fly.dev
 - **Backend:** https://crossverse-backend.fly.dev
 - **Vector DB:** Qdrant Cloud (AWS N. Virginia, private)
 
@@ -82,7 +82,7 @@ fly secrets set OPENAI_API_KEY="sk-..."         -a crossverse-backend
 fly secrets set ANTHROPIC_API_KEY="sk-ant-..."  -a crossverse-backend
 fly secrets set QDRANT_URL="https://..."        -a crossverse-backend
 fly secrets set QDRANT_API_KEY="..."            -a crossverse-backend
-fly secrets set ALLOWED_ORIGINS="https://crossverse-frontend.fly.dev" -a crossverse-backend
+fly secrets set ALLOWED_ORIGINS="https://crossverse.fly.dev" -a crossverse-backend
 ```
 
 ### Redeploy
