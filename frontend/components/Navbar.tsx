@@ -214,7 +214,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </nav>
+    <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
   );
 }

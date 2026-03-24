@@ -7,15 +7,38 @@ import { getDailyBriefing } from '@/lib/api';
 import type { DailyResponse } from '@/lib/types';
 import { RELIGION_COLORS, RELIGION_EMOJI, ALL_RELIGIONS } from '@/lib/types';
 
+const LOADING_QUOTES = [
+  '"Be still and know." — Psalm 46:10',
+  '"The quieter you become, the more you can hear." — Ram Dass',
+  '"Peace comes from within." — Dhammapada',
+  '"In remembrance of God do hearts find rest." — Quran 13:28',
+  '"Silence is the language of God." — Rumi',
+  '"The Tao that can be told is not the eternal Tao." — Tao Te Ching',
+  '"Where there is love, there is life." — Gandhi',
+  '"Let your soul stand cool and composed." — Walt Whitman',
+];
+
 function SkeletonGrid() {
+  const [quoteIdx, setQuoteIdx] = useState(() => Math.floor(Math.random() * LOADING_QUOTES.length));
+
+  useEffect(() => {
+    const t = setInterval(() => setQuoteIdx((i) => (i + 1) % LOADING_QUOTES.length), 2500);
+    return () => clearInterval(t);
+  }, []);
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div
-          key={i}
-          className="animate-pulse rounded-2xl border border-white/10 bg-white/5 p-5 h-40"
-        />
-      ))}
+    <div>
+      <p className="mb-5 text-center text-sm italic text-indigo-300 animate-pulse transition-all">
+        {LOADING_QUOTES[quoteIdx]}
+      </p>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div
+            key={i}
+            className="animate-pulse rounded-2xl border border-white/10 bg-white/5 p-5 h-40"
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -80,10 +103,11 @@ export default function LivingHero() {
       setDaily(data);
       // Stagger cards in after data lands
       let count = 0;
+      const total = Object.keys(data.perspectives).length;
       const interval = setInterval(() => {
         count += 1;
         setVisibleCards(count);
-        if (count >= 6) clearInterval(interval);
+        if (count >= total) clearInterval(interval);
       }, 150);
     } catch {
       // silently fail — hero degrades gracefully
@@ -106,7 +130,7 @@ export default function LivingHero() {
     : null;
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-indigo-950 via-indigo-900 to-indigo-800 px-4 py-16 text-white">
+    <section className="relative overflow-hidden bg-gradient-to-b from-indigo-950 via-indigo-900 to-indigo-800 px-4 py-10 text-white">
       <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-violet-600/20 blur-3xl" />
       <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-indigo-400/20 blur-3xl" />
 
@@ -122,7 +146,7 @@ export default function LivingHero() {
           {daily ? (
             <>
               <p className="mb-1 text-sm font-medium uppercase tracking-wider text-indigo-300">
-                Today, all 6 traditions speak about:
+                Today, all {Object.keys(daily.perspectives).length} traditions speak about:
               </p>
               <h1 className="text-4xl font-extrabold capitalize sm:text-5xl">
                 <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
