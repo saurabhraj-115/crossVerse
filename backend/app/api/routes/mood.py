@@ -15,6 +15,8 @@ from app.core.llm import chat_complete
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+_cache: Dict[str, MoodResponse] = {}
+
 MOOD_QUERIES: Dict[str, str] = {
     "grief": "loss death mourning comfort sorrow",
     "joy": "celebration delight happiness blessing abundance",
@@ -50,6 +52,10 @@ async def mood_scripture(request: MoodRequest) -> MoodResponse:
     """
     try:
         mood = request.mood
+
+        if mood in _cache:
+            return _cache[mood]
+
         expanded_query = MOOD_QUERIES.get(mood, mood)
         query_vector = await embed_query(expanded_query)
 
@@ -79,14 +85,16 @@ async def mood_scripture(request: MoodRequest) -> MoodResponse:
             {"role": "user", "content": user_message},
         ]
 
-        message = await chat_complete(messages, temperature=0.5)
+        message = await chat_complete(messages, temperature=0.5, max_tokens=300)
 
-        return MoodResponse(
+        response = MoodResponse(
             mood=mood,
             message=message,
             verses=all_chunks,
             sources=all_chunks,
         )
+        _cache[mood] = response
+        return response
 
     except HTTPException:
         raise

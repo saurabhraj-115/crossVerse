@@ -129,7 +129,8 @@ async def query_scriptures(
     messages.append({"role": "user", "content": user_message})
 
     # 5. Generate answer
-    answer = await chat_complete(messages, temperature=0.2)
+    mode_tokens = {"scholar": 2048, "simple": 500, "child": 300}
+    answer = await chat_complete(messages, temperature=0.2, max_tokens=mode_tokens.get(mode, 500))
 
     return QueryResponse(
         answer=answer,
@@ -177,7 +178,7 @@ async def find_contradictions(
     settings = get_settings()
     query_vector = await embed_query(topic)
 
-    chunks = await _search_qdrant(query_vector, [religion], top_k=10)
+    chunks = await _search_qdrant(query_vector, [religion], top_k=8)
 
     if len(chunks) < 2:
         return []
@@ -198,6 +199,7 @@ async def find_contradictions(
     raw = await chat_complete(
         [{"role": "system", "content": system}, {"role": "user", "content": user}],
         temperature=0.3,
+        max_tokens=500,
     )
 
     import json

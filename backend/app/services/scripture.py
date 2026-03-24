@@ -60,7 +60,6 @@ def build_context_block(chunks: list[ScriptureChunk]) -> str:
     for i, chunk in enumerate(chunks, start=1):
         lines.append(
             f"[{i}] ({chunk.religion}) {chunk.reference}\n"
-            f"    Translation: {chunk.translation}\n"
             f"    \"{chunk.text}\""
         )
     return "\n\n".join(lines)

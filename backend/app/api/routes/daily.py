@@ -41,7 +41,9 @@ SYSTEM_PROMPT = (
     "write a 2-sentence daily reflection for the given tradition on the given theme. "
     "The reflection should be moving, honest, and grounded in the text. "
     "Cite the passage reference naturally within the sentences — no footnotes. "
-    "Do NOT add any preamble or conclusion — just the 2 sentences."
+    "Do NOT add any preamble or conclusion — just the 2 sentences. "
+    "CRITICAL: You MUST always write the 2 sentences. Never refuse or explain why you cannot. "
+    "If the passages do not perfectly match the theme, find the closest connection and write the reflection anyway."
 )
 
 
@@ -50,14 +52,11 @@ async def _get_daily_perspective(
     religion: str,
     query_vector: List[float],
     offset: int = 0,
-) -> tuple[str, DailyPerspective]:
+) -> tuple[str, Optional[DailyPerspective]]:
     chunks = await _search_qdrant(query_vector, [religion], top_k=3, offset=offset)
 
     if not chunks:
-        return religion, DailyPerspective(
-            reflection=f"No passages found in {religion} for today's theme.",
-            sources=[],
-        )
+        return religion, None
 
     context = build_context_block(chunks)
     user_message = (
@@ -72,7 +71,7 @@ async def _get_daily_perspective(
         {"role": "user", "content": user_message},
     ]
 
-    reflection = await chat_complete(messages, temperature=0.5)
+    reflection = await chat_complete(messages, temperature=0.5, max_tokens=150)
     return religion, DailyPerspective(reflection=reflection, sources=chunks)
 
 
@@ -120,13 +119,10 @@ async def daily_briefing(fresh: bool = False) -> DailyResponse:
             religion = SUPPORTED_RELIGIONS[i]
             if isinstance(result, Exception):
                 logger.warning("Daily: error for %s: %s", religion, result)
-                perspectives[religion] = DailyPerspective(
-                    reflection=f"Unable to generate reflection for {religion} today.",
-                    sources=[],
-                )
             else:
                 rel, perspective = result
-                perspectives[rel] = perspective
+                if perspective is not None:
+                    perspectives[rel] = perspective
 
         response = DailyResponse(
             theme=theme,

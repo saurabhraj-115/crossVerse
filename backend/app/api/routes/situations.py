@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException
 
@@ -13,6 +14,8 @@ from app.core.llm import chat_complete
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+_cache: Dict[str, SituationResponse] = {}
 
 SYSTEM_PROMPT = (
     "You are a compassionate wisdom guide drawing only from sacred scripture. "
@@ -33,11 +36,18 @@ async def get_situation_wisdom(request: SituationRequest) -> SituationResponse:
     to synthesize human wisdom in a warm, non-preachy tone.
     """
     try:
+        cache_key = hashlib.sha256(
+            f"{request.situation}:{sorted(request.religions or [])}".encode()
+        ).hexdigest()[:16]
+
+        if cache_key in _cache:
+            return _cache[cache_key]
+
         query_vector = await embed_query(request.situation)
         chunks: List[ScriptureChunk] = await _search_qdrant(
             query_vector,
             request.religions,
-            top_k=12,
+            top_k=8,
         )
 
         if not chunks:
@@ -61,13 +71,17 @@ async def get_situation_wisdom(request: SituationRequest) -> SituationResponse:
             {"role": "user", "content": user_message},
         ]
 
-        wisdom = await chat_complete(messages, temperature=0.4)
+        wisdom = await chat_complete(messages, temperature=0.4, max_tokens=600)
 
-        return SituationResponse(
+        response = SituationResponse(
             wisdom=wisdom,
             sources=chunks,
             situation=request.situation,
         )
+        if len(_cache) > 500:
+            _cache.clear()
+        _cache[cache_key] = response
+        return response
 
     except Exception as exc:
         logger.exception("Error in /situations: %s", exc)

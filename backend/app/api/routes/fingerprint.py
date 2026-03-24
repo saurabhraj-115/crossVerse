@@ -183,7 +183,7 @@ async def analyze_fingerprint(request: FingerprintAnalyzeRequest) -> Fingerprint
             {"role": "user", "content": user_message},
         ]
 
-        raw = await chat_complete(messages, temperature=0.2)
+        raw = await chat_complete(messages, temperature=0.2, max_tokens=400)
 
         # Parse JSON response
         m = re.search(r"\{.*\}", raw, re.DOTALL)

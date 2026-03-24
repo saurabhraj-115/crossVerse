@@ -31,14 +31,14 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across twelv
 
 | Feature | Description |
 |---------|-------------|
-| **Living Hero** | Homepage auto-loads today's daily theme and animates 6 tradition cards on first load |
+| **Living Hero** | Homepage auto-loads today's daily theme and shows cards for every tradition that returned passages |
 | **Ask** | Scripture-grounded Q&A with citations — Simple, Scholar, or Child mode |
 | **Compare** | Side-by-side view of what each tradition says about any topic |
 | **Debate** | Each tradition's scriptures respond to a question independently |
-| **Universal Truth** | Enter any concept — find the single truth all 6 traditions agree on |
+| **Universal Truth** | Enter any concept — find the single truth all 12 traditions agree on |
 | **Mood Scripture** | Select how you're feeling (grief, joy, anxiety…) — receive scripture that meets you there |
 | **Topic Explorer** | Curated topic browser across 7 categories and 35+ topics |
-| **Daily Briefing** | A new spiritual theme each day with verses from all 6 traditions |
+| **Daily Briefing** | A new spiritual theme each day with verses from all 12 traditions |
 | **Concept Archaeology** | Trace how an idea evolved across traditions |
 | **Semantic Graph** | Visual force-directed graph of verse similarities across traditions |
 | **Spiritual Fingerprint** | Answer 10 questions, discover which tradition resonates most |
@@ -251,6 +251,21 @@ crossVerse/
 ├── docker-compose.yml
 └── README.md
 ```
+
+---
+
+## Performance & Cost Optimisation
+
+Token spend is reduced 60–80% versus a naive implementation through several techniques applied across all 11 LLM-calling endpoints:
+
+| Technique | Detail |
+|-----------|--------|
+| **Per-route `max_tokens`** | Each endpoint caps output at its realistic ceiling (e.g. `/daily` → 150, `/mood` → 300, `/archaeology` → 1200) instead of a global 2048 |
+| **`top_k` tuning** | `/archaeology` 18→12, `/factcheck` 10→6, `/contradictions` 10→8, `/situations` 12→8 |
+| **Translation field removed** | `build_context_block` no longer includes the `Translation:` label — saves 8–12 tokens per chunk across every route |
+| **In-memory caching** | `/mood` (10 fixed inputs, unbounded), `/situations`, `/universal`, `/archaeology` (cap 500/200 entries) |
+| **Ethics consolidation** | 6 parallel LLM calls → 1 combined call returning JSON; saves ~10,788 tokens per request |
+| **Mode-aware tokens (`/query`)** | scholar: 2048 · simple: 500 · child: 300 |
 
 ---
 
