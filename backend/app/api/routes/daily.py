@@ -58,9 +58,13 @@ SYSTEM_PROMPT = (
 )
 
 THEME_PICKER_SYSTEM = (
-    "You extract a single universal spiritual/ethical theme from news headlines. "
-    "Return ONLY a 2-4 word lowercase phrase (e.g. 'justice and suffering', 'hope amid crisis', 'the weight of war'). "
-    "No explanation, no punctuation, just the phrase."
+    "You are a spiritual theme extractor. Given news headlines, you pick the single most "
+    "ethically or spiritually rich headline and derive a universal theme directly from it. "
+    "Reply with EXACTLY two lines — nothing else:\n"
+    "LINE1: the exact verbatim headline you chose (copy it word-for-word)\n"
+    "LINE2: a 2-4 word lowercase spiritual theme that directly captures what that headline is about "
+    "(e.g. if the headline is about a famine → 'hunger and compassion'; "
+    "if it is about a ceasefire → 'peace after conflict')"
 )
 
 
@@ -109,26 +113,19 @@ async def _pick_theme_from_news() -> tuple[Optional[str], Optional[str]]:
                 "role": "user",
                 "content": (
                     f"Today's top news headlines:\n{numbered}\n\n"
-                    "Identify the single most spiritually or ethically significant theme "
-                    "that ALL twelve world religions could meaningfully address. "
-                    "Reply with exactly two lines:\n"
-                    "LINE1: the 2-4 word lowercase theme phrase\n"
-                    "LINE2: the exact headline number (just the digit) that most inspired it"
+                    "Pick the headline richest in spiritual or ethical meaning. "
+                    "Return exactly two lines as instructed."
                 ),
             },
         ]
-        raw = await chat_complete(messages, temperature=0.3, max_tokens=30)
+        raw = await chat_complete(messages, temperature=0.2, max_tokens=80)
         lines = [l.strip() for l in raw.strip().splitlines() if l.strip()]
-        theme = lines[0].strip('"').strip("'").lower() if lines else None
-        source_headline = None
-        if len(lines) >= 2:
-            try:
-                idx = int(lines[1]) - 1
-                if 0 <= idx < len(headlines):
-                    source_headline = headlines[idx]
-            except ValueError:
-                pass
-        if theme and len(theme.split()) <= 6:
+        if len(lines) < 2:
+            return None, None
+        source_headline = lines[0].strip('"').strip("'")
+        theme = lines[1].strip('"').strip("'").lower()
+        # Validate: theme must be short, headline must look like a real headline
+        if theme and len(theme.split()) <= 6 and len(source_headline) > 10:
             return theme, source_headline
         return None, None
     except Exception as e:
@@ -256,10 +253,8 @@ async def daily_briefing_stream(fresh: bool = False):
         cached = _cache[today_str]
 
         async def _stream_cached():
-            all_headlines = await _fetch_news_headlines()
             yield _sse({"type": "theme", "theme": cached.theme,
-                        "date": cached.date, "headline": cached.headline,
-                        "headlines": all_headlines})
+                        "date": cached.date, "headline": cached.headline})
             for religion, perspective in cached.perspectives.items():
                 yield _sse({"type": "card", "religion": religion,
                             "perspective": perspective.dict()})
@@ -292,11 +287,9 @@ async def daily_briefing_stream(fresh: bool = False):
                     seed = int(hashlib.md5(today_str.encode()).hexdigest(), 16)
                     theme = THEMES[seed % len(THEMES)]
 
-            # Emit theme + all headlines so UI can rotate them
-            all_headlines = await _fetch_news_headlines()
+            # Emit theme immediately — unblocks the UI header
             yield _sse({"type": "theme", "theme": theme,
-                        "date": today_str, "headline": headline,
-                        "headlines": all_headlines})
+                        "date": today_str, "headline": headline})
 
             query_vector = await embed_query(theme)
 
