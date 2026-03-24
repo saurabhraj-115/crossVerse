@@ -453,8 +453,9 @@ export default function LivingHero() {
       try {
         const msg = JSON.parse(e.data);
         if (msg.type === 'theme') {
-          setStreamTheme({ theme: msg.theme, date: msg.date, headline: msg.headline, headlines: msg.headlines });
-          setHeadlineIdx(0);
+          const hl = msg.headlines ?? [];
+          setStreamTheme({ theme: msg.theme, date: msg.date, headline: msg.headline, headlines: hl });
+          setHeadlineIdx(hl.length > 1 ? Math.floor(Math.random() * hl.length) : 0);
           setLoading(false); // header is ready — drop the skeleton bars
         } else if (msg.type === 'card') {
           setPerspectives((prev) => ({ ...prev, [msg.religion]: msg.perspective }));
@@ -485,13 +486,6 @@ export default function LivingHero() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Rotate through headlines every 5 s
-  useEffect(() => {
-    const count = streamTheme?.headlines?.length ?? 0;
-    if (count <= 1) return;
-    const t = setInterval(() => setHeadlineIdx((i) => (i + 1) % count), 5000);
-    return () => clearInterval(t);
-  }, [streamTheme?.headlines]);
 
   const formattedDate = streamTheme?.date
     ? new Date(streamTheme.date + 'T00:00:00').toLocaleDateString('en-US', {
@@ -549,9 +543,6 @@ export default function LivingHero() {
                       <span className="flex h-2 w-2 shrink-0 rounded-full bg-red-500 animate-pulse" />
                       <span className="text-xs text-red-600 dark:text-white/60 font-medium uppercase tracking-wider shrink-0">In the news</span>
                       <span className="text-xs text-gray-800 dark:text-white/90 font-medium leading-snug truncate">"{current}"</span>
-                      {headlines.length > 1 && (
-                        <span className="text-[10px] text-gray-400 dark:text-white/30 shrink-0">{headlineIdx + 1}/{headlines.length}</span>
-                      )}
                     </a>
                   );
                 })()}
