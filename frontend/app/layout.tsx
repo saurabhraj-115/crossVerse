@@ -8,14 +8,31 @@ import { SettingsProvider } from '@/lib/settings-context';
 
 const inter = Inter({ subsets: ['latin'] });
 
+const APP_URL = 'https://crossverse.fly.dev';
+const DESCRIPTION = 'Ask any question and get answers from 12 sacred traditions — Bible, Quran, Bhagavad Gita, and more. Always cited, never opinionated.';
+
 export const metadata: Metadata = {
   title: 'CrossVerse — Explore Religious Texts with AI',
-  description:
-    'AI-powered platform for exploring sacred scriptures across traditions. Ask questions, compare perspectives, and discover what every religion says about any topic.',
+  description: DESCRIPTION,
   keywords: [
     'religious texts', 'scripture', 'Bible', 'Quran', 'Bhagavad Gita',
     'Dhammapada', 'Guru Granth Sahib', 'AI', 'RAG', 'comparative religion',
   ],
+  metadataBase: new URL(APP_URL),
+  openGraph: {
+    type: 'website',
+    url: APP_URL,
+    siteName: 'CrossVerse',
+    title: 'CrossVerse — Ask Any Question Across 12 Sacred Traditions',
+    description: DESCRIPTION,
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'CrossVerse' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CrossVerse — Ask Any Question Across 12 Sacred Traditions',
+    description: DESCRIPTION,
+    images: ['/opengraph-image'],
+  },
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
