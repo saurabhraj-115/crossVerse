@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, RefreshCw, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowRight, RefreshCw, Sparkles, Send } from 'lucide-react';
 import { getDailyBriefing } from '@/lib/api';
 import type { DailyResponse } from '@/lib/types';
 import { RELIGION_COLORS, RELIGION_EMOJI, ALL_RELIGIONS } from '@/lib/types';
@@ -85,9 +86,17 @@ function CardGrid({ daily }: { daily: DailyResponse }) {
 }
 
 export default function LivingHero() {
+  const router = useRouter();
   const [daily, setDaily] = useState<DailyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [question, setQuestion] = useState('');
+
+  const handleAsk = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!question.trim()) return;
+    router.push(`/query?q=${encodeURIComponent(question.trim())}`);
+  };
 
   async function fetchDaily(fresh = false) {
     if (fresh) {
@@ -156,6 +165,30 @@ export default function LivingHero() {
           )}
         </div>
 
+        {/* Ask box — primary CTA */}
+        <form onSubmit={handleAsk} className="mb-10">
+          <div className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 p-2 backdrop-blur-sm focus-within:border-white/40 focus-within:bg-white/15 transition-all shadow-lg">
+            <input
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask anything — grief, purpose, forgiveness, what happens after death…"
+              className="flex-1 bg-transparent px-3 py-2 text-sm text-white placeholder-white/50 outline-none sm:text-base"
+            />
+            <button
+              type="submit"
+              disabled={!question.trim()}
+              className="flex shrink-0 items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-indigo-900 hover:bg-indigo-50 disabled:opacity-40 transition-colors shadow"
+            >
+              <Send size={15} />
+              <span className="hidden sm:inline">Ask Scripture</span>
+            </button>
+          </div>
+          <p className="mt-2 px-1 text-xs text-indigo-300/80">
+            Answers from 12 traditions · always cited · never opinionated
+          </p>
+        </form>
+
         {/* Cards */}
         <div className="mb-8">
           {loading ? (
@@ -165,19 +198,13 @@ export default function LivingHero() {
           ) : null}
         </div>
 
-        {/* CTAs */}
+        {/* Secondary CTAs */}
         <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/query"
-            className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-indigo-900 hover:bg-indigo-50 transition-colors shadow-lg"
-          >
-            Ask Your Own Question <ArrowRight size={16} />
-          </Link>
           <Link
             href="/fingerprint"
             className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/20 transition-colors backdrop-blur-sm"
           >
-            Find Your Tradition
+            Find Your Tradition <ArrowRight size={15} />
           </Link>
           <button
             onClick={() => fetchDaily(true)}
