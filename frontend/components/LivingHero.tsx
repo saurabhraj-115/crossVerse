@@ -413,13 +413,11 @@ interface StreamTheme {
   theme: string;
   date: string;
   headline?: string | null;
-  headlines?: string[];
 }
 
 export default function LivingHero() {
   const router = useRouter();
   const [streamTheme, setStreamTheme] = useState<StreamTheme | null>(null);
-  const [headlineIdx, setHeadlineIdx] = useState(0);
   const [perspectives, setPerspectives] = useState<Record<string, DailyPerspective>>({});
   const [loading, setLoading] = useState(true);  // true = skeleton showing
   const [done, setDone] = useState(false);        // true = all 12 streamed in
@@ -453,9 +451,7 @@ export default function LivingHero() {
       try {
         const msg = JSON.parse(e.data);
         if (msg.type === 'theme') {
-          const hl = msg.headlines ?? [];
-          setStreamTheme({ theme: msg.theme, date: msg.date, headline: msg.headline, headlines: hl });
-          setHeadlineIdx(hl.length > 1 ? Math.floor(Math.random() * hl.length) : 0);
+          setStreamTheme({ theme: msg.theme, date: msg.date, headline: msg.headline });
           setLoading(false); // header is ready — drop the skeleton bars
         } else if (msg.type === 'card') {
           setPerspectives((prev) => ({ ...prev, [msg.religion]: msg.perspective }));
@@ -528,11 +524,8 @@ export default function LivingHero() {
                     {streamTheme.theme}
                   </span>
                 </h1>
-                {(() => {
-                  const headlines = streamTheme.headlines ?? (streamTheme.headline ? [streamTheme.headline] : []);
-                  const current = headlines[headlineIdx];
-                  if (!current) return null;
-                  const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(current)}&tbm=nws`;
+                {streamTheme.headline && (() => {
+                  const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(streamTheme.headline!)}&tbm=nws`;
                   return (
                     <a
                       href={searchUrl}
@@ -541,8 +534,8 @@ export default function LivingHero() {
                       className="mt-3 inline-flex max-w-full items-center gap-2 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 dark:border-white/15 dark:bg-white/10 dark:hover:bg-white/15 px-3 py-1.5 backdrop-blur-sm transition-colors cursor-pointer"
                     >
                       <span className="flex h-2 w-2 shrink-0 rounded-full bg-red-500 animate-pulse" />
-                      <span className="text-xs text-red-600 dark:text-white/60 font-medium uppercase tracking-wider shrink-0">In the news</span>
-                      <span className="text-xs text-gray-800 dark:text-white/90 font-medium leading-snug truncate">"{current}"</span>
+                      <span className="text-xs text-red-600 dark:text-white/60 font-medium uppercase tracking-wider shrink-0">Inspired by</span>
+                      <span className="text-xs text-gray-800 dark:text-white/90 font-medium leading-snug truncate">"{streamTheme.headline}"</span>
                     </a>
                   );
                 })()}
