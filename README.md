@@ -32,7 +32,8 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across twelv
 | Feature | Description |
 |---------|-------------|
 | **Traditions Ticker** | Animated marquee just below the navbar shows all 12 live traditions with pulsating color dots |
-| **Living Hero** | Homepage auto-loads today's daily theme; clicking a tradition card opens a per-card modal with full reflection, citations, and an inline follow-up chat input |
+| **Living Hero** | Homepage streams tradition cards one by one via SSE — theme title appears in ~1s, cards pop in as each LLM call completes |
+| **News-driven themes** | Daily theme is derived from today's top headlines — Claude picks the richest headline, derives a spiritual theme directly from it, and shows an "Inspired by" pill linking to a Google News search |
 | **Ask** | Scripture-grounded Q&A with citations — Simple, Scholar, or Child mode; pre-filtered when navigated to from a tradition card |
 | **Compare** | Side-by-side view of what each tradition says about any topic |
 | **Debate** | Each tradition's scriptures respond to a question independently |
