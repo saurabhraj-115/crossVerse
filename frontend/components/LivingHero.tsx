@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, BookOpen, Download, RefreshCw, Send, Share2, Sparkles, X } from 'lucide-react';
 import Link from 'next/link';
-import { getDailyBriefing } from '@/lib/api';
 import type { DailyResponse, DailyPerspective, Religion } from '@/lib/types';
 import { RELIGION_COLORS, RELIGION_EMOJI, ALL_RELIGIONS } from '@/lib/types';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 // ---------------------------------------------------------------------------
 // Share card canvas generator
@@ -408,13 +409,24 @@ function CardGrid({
   );
 }
 
+interface StreamTheme {
+  theme: string;
+  date: string;
+  headline?: string | null;
+  headlines?: string[];
+}
+
 export default function LivingHero() {
   const router = useRouter();
-  const [daily, setDaily] = useState<DailyResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [streamTheme, setStreamTheme] = useState<StreamTheme | null>(null);
+  const [headlineIdx, setHeadlineIdx] = useState(0);
+  const [perspectives, setPerspectives] = useState<Record<string, DailyPerspective>>({});
+  const [loading, setLoading] = useState(true);  // true = skeleton showing
+  const [done, setDone] = useState(false);        // true = all 12 streamed in
   const [refreshing, setRefreshing] = useState(false);
   const [question, setQuestion] = useState('');
   const [activeCard, setActiveCard] = useState<string | null>(null);
+  const esRef = useRef<EventSource | null>(null);
 
   const handleAsk = (e: React.FormEvent) => {
     e.preventDefault();
@@ -422,37 +434,80 @@ export default function LivingHero() {
     router.push(`/query?q=${encodeURIComponent(question.trim())}`);
   };
 
-  async function fetchDaily(fresh = false) {
+  function fetchDaily(fresh = false) {
+    // Close any existing stream
+    esRef.current?.close();
+
     if (fresh) {
       setRefreshing(true);
-      setDaily(null);
+      setStreamTheme(null);
+      setPerspectives({});
+      setDone(false);
     }
     setLoading(true);
-    try {
-      const data = await getDailyBriefing(fresh);
-      setDaily(data);
-    } catch {
-      // silently fail
-    } finally {
+
+    const es = new EventSource(`${API_BASE}/daily/stream${fresh ? '?fresh=true' : ''}`);
+    esRef.current = es;
+
+    es.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        if (msg.type === 'theme') {
+          setStreamTheme({ theme: msg.theme, date: msg.date, headline: msg.headline, headlines: msg.headlines });
+          setHeadlineIdx(0);
+          setLoading(false); // header is ready — drop the skeleton bars
+        } else if (msg.type === 'card') {
+          setPerspectives((prev) => ({ ...prev, [msg.religion]: msg.perspective }));
+        } else if (msg.type === 'done') {
+          setDone(true);
+          setRefreshing(false);
+          es.close();
+        } else if (msg.type === 'error') {
+          setLoading(false);
+          setRefreshing(false);
+          es.close();
+        }
+      } catch {
+        // malformed event — ignore
+      }
+    };
+
+    es.onerror = () => {
       setLoading(false);
       setRefreshing(false);
-    }
+      es.close();
+    };
   }
 
   useEffect(() => {
     fetchDaily(false);
+    return () => esRef.current?.close();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const formattedDate = daily?.date
-    ? new Date(daily.date + 'T00:00:00').toLocaleDateString('en-US', {
+  // Rotate through headlines every 5 s
+  useEffect(() => {
+    const count = streamTheme?.headlines?.length ?? 0;
+    if (count <= 1) return;
+    const t = setInterval(() => setHeadlineIdx((i) => (i + 1) % count), 5000);
+    return () => clearInterval(t);
+  }, [streamTheme?.headlines]);
+
+  const formattedDate = streamTheme?.date
+    ? new Date(streamTheme.date + 'T00:00:00').toLocaleDateString('en-US', {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
       })
     : null;
 
-  const traditionCount = daily ? Object.keys(daily.perspectives).length : null;
-  const activePerspective = activeCard && daily ? daily.perspectives[activeCard as Religion] : null;
+  const traditionCount = Object.keys(perspectives).length || null;
+  const activePerspective = activeCard ? perspectives[activeCard] : null;
+
+  // Build a DailyResponse-shaped object for CardGrid / CardModal
+  const dailyForCards = streamTheme
+    ? { theme: streamTheme.theme, date: streamTheme.date, perspectives: perspectives as any, headline: streamTheme.headline }
+    : null;
 
   return (
     <>
@@ -469,23 +524,37 @@ export default function LivingHero() {
 
           {/* Header */}
           <div className="mb-8">
-            {daily ? (
+            {streamTheme ? (
               <>
                 <p className="mb-1 text-sm font-medium uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
-                  Today, all {traditionCount} traditions speak about:
+                  Today, all {traditionCount ?? '…'} traditions speak about:
                 </p>
                 <h1 className="text-3xl font-extrabold capitalize sm:text-4xl md:text-5xl">
                   <span className="bg-gradient-to-r from-yellow-500 to-orange-500 dark:from-yellow-300 dark:to-orange-300 bg-clip-text text-transparent">
-                    {daily.theme}
+                    {streamTheme.theme}
                   </span>
                 </h1>
-                {daily.headline && (
-                  <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 dark:border-white/15 dark:bg-white/10 px-3 py-1.5 backdrop-blur-sm">
-                    <span className="flex h-2 w-2 shrink-0 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-xs text-red-600 dark:text-white/60 font-medium uppercase tracking-wider">Today in the news</span>
-                    <span className="text-xs text-gray-800 dark:text-white/90 font-medium leading-snug">"{daily.headline}"</span>
-                  </div>
-                )}
+                {(() => {
+                  const headlines = streamTheme.headlines ?? (streamTheme.headline ? [streamTheme.headline] : []);
+                  const current = headlines[headlineIdx];
+                  if (!current) return null;
+                  const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(current)}&tbm=nws`;
+                  return (
+                    <a
+                      href={searchUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex max-w-full items-center gap-2 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 dark:border-white/15 dark:bg-white/10 dark:hover:bg-white/15 px-3 py-1.5 backdrop-blur-sm transition-colors cursor-pointer"
+                    >
+                      <span className="flex h-2 w-2 shrink-0 rounded-full bg-red-500 animate-pulse" />
+                      <span className="text-xs text-red-600 dark:text-white/60 font-medium uppercase tracking-wider shrink-0">In the news</span>
+                      <span className="text-xs text-gray-800 dark:text-white/90 font-medium leading-snug truncate">"{current}"</span>
+                      {headlines.length > 1 && (
+                        <span className="text-[10px] text-gray-400 dark:text-white/30 shrink-0">{headlineIdx + 1}/{headlines.length}</span>
+                      )}
+                    </a>
+                  );
+                })()}
                 {formattedDate && (
                   <p className="mt-2 text-sm text-indigo-500 dark:text-indigo-300">{formattedDate}</p>
                 )}
@@ -526,9 +595,20 @@ export default function LivingHero() {
           <div className="mb-8">
             {loading ? (
               <SkeletonGrid />
-            ) : daily ? (
-              <CardGrid daily={daily} onCardClick={setActiveCard} />
-            ) : null}
+            ) : (
+              <>
+                {dailyForCards && Object.keys(perspectives).length > 0 && (
+                  <CardGrid daily={dailyForCards} onCardClick={setActiveCard} />
+                )}
+                {!done && streamTheme && (
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: Math.max(0, 12 - Object.keys(perspectives).length) }).map((_, i) => (
+                      <div key={i} className="animate-pulse rounded-2xl border border-indigo-100 bg-indigo-50 dark:border-white/10 dark:bg-white/5 p-5 h-40" />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Secondary CTAs */}
@@ -552,11 +632,11 @@ export default function LivingHero() {
       </section>
 
       {/* Per-card modal */}
-      {activeCard && activePerspective && daily && (
+      {activeCard && activePerspective && streamTheme && (
         <CardModal
           religion={activeCard}
           perspective={activePerspective}
-          theme={daily.theme}
+          theme={streamTheme.theme}
           onClose={() => setActiveCard(null)}
         />
       )}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import random
 import xml.etree.ElementTree as ET
@@ -9,6 +10,7 @@ from typing import Dict, List, Optional
 
 import httpx
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 
 from app.models.schemas import DailyResponse, DailyPerspective, ScriptureChunk
 from app.services.embeddings import embed_query
@@ -228,3 +230,116 @@ async def daily_briefing(fresh: bool = False) -> DailyResponse:
     except Exception as exc:
         logger.exception("Error in /daily: %s", exc)
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+def _sse(payload: dict) -> str:
+    return f"data: {json.dumps(payload)}\n\n"
+
+
+@router.get("/daily/stream", summary="Daily scripture briefing (SSE streaming)")
+async def daily_briefing_stream(fresh: bool = False):
+    """
+    Server-Sent Events version of /daily.
+    Emits events as each tradition completes so the UI can render cards
+    progressively instead of waiting for all 12 LLM calls to finish.
+
+    Event types:
+      {"type": "theme",  "theme": str, "date": str, "headline": str|null}
+      {"type": "card",   "religion": str, "perspective": {...}}
+      {"type": "done"}
+      {"type": "error",  "message": str}
+    """
+    today_str = date.today().isoformat()
+
+    # ── Cache hit: stream stored data immediately ──────────────────────────
+    if not fresh and today_str in _cache:
+        cached = _cache[today_str]
+
+        async def _stream_cached():
+            all_headlines = await _fetch_news_headlines()
+            yield _sse({"type": "theme", "theme": cached.theme,
+                        "date": cached.date, "headline": cached.headline,
+                        "headlines": all_headlines})
+            for religion, perspective in cached.perspectives.items():
+                yield _sse({"type": "card", "religion": religion,
+                            "perspective": perspective.dict()})
+                await asyncio.sleep(0)
+            yield _sse({"type": "done"})
+
+        return StreamingResponse(
+            _stream_cached(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+
+    # ── Live generation: stream each card as it arrives ───────────────────
+    async def _stream_live():
+        try:
+            headline: Optional[str] = None
+            if fresh:
+                offset = random.randint(3, 30)
+                theme, headline = await _pick_theme_from_news()
+                if not theme:
+                    day_of_year = date.today().timetuple().tm_yday
+                    default_idx = day_of_year % len(THEMES)
+                    other_indices = [i for i in range(len(THEMES)) if i != default_idx]
+                    theme = THEMES[random.choice(other_indices)]
+            else:
+                offset = 0
+                theme, headline = await _pick_theme_from_news()
+                if not theme:
+                    import hashlib
+                    seed = int(hashlib.md5(today_str.encode()).hexdigest(), 16)
+                    theme = THEMES[seed % len(THEMES)]
+
+            # Emit theme + all headlines so UI can rotate them
+            all_headlines = await _fetch_news_headlines()
+            yield _sse({"type": "theme", "theme": theme,
+                        "date": today_str, "headline": headline,
+                        "headlines": all_headlines})
+
+            query_vector = await embed_query(theme)
+
+            # Fan-out: each tradition pushes its result into a queue as it finishes
+            queue: asyncio.Queue = asyncio.Queue()
+
+            async def _fetch_one(religion: str) -> None:
+                try:
+                    rel, perspective = await _get_daily_perspective(
+                        theme, religion, query_vector, offset
+                    )
+                    await queue.put((rel, perspective))
+                except Exception as e:
+                    logger.warning("Stream: error for %s: %s", religion, e)
+                    await queue.put((religion, None))
+
+            tasks = [asyncio.create_task(_fetch_one(r)) for r in SUPPORTED_RELIGIONS]
+
+            collected: Dict[str, DailyPerspective] = {}
+            for _ in SUPPORTED_RELIGIONS:
+                religion, perspective = await queue.get()
+                if perspective is not None:
+                    collected[religion] = perspective
+                    yield _sse({"type": "card", "religion": religion,
+                                "perspective": perspective.dict()})
+
+            yield _sse({"type": "done"})
+
+            # Populate the date cache so subsequent loads are instant
+            if not fresh:
+                _cache[today_str] = DailyResponse(
+                    theme=theme,
+                    date=today_str,
+                    perspectives=collected,
+                    headline=headline,
+                )
+
+        except Exception as exc:
+            logger.exception("Error in /daily/stream: %s", exc)
+            yield _sse({"type": "error", "message": str(exc)})
+
+    return StreamingResponse(
+        _stream_live(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
