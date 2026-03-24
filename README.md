@@ -51,6 +51,7 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across twelv
 | **Voice Input** | Speak your question — mic transcription built in |
 | **Share & Cite** | Native OS share sheet + Chicago / MLA / SBL citation formats per verse |
 | **Dark Mode** | Full dark mode across all pages — religion badges, source cards, and verse text all tuned for legibility |
+| **Analytics** | Google Analytics 4 (traffic, sessions, geo) + PostHog (named product events: card opens, shares, questions asked, mood picks, theme loads) |
 
 ---
 
@@ -61,8 +62,9 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across twelv
 | Backend | FastAPI (Python 3.11) |
 | Vector DB | Qdrant Cloud (free tier, AWS us-east-1) |
 | Embeddings | OpenAI `text-embedding-3-small` (1536-dim) |
-| LLM | Anthropic Claude Sonnet 4.6 |
+| LLM | Anthropic Claude — Sonnet 4.6 (deep analysis) + Haiku 4.5 (fast routes) |
 | Frontend | Next.js 14 (App Router) + Tailwind CSS |
+| Analytics | Google Analytics 4 + PostHog |
 | Deployment | Fly.io (frontend + backend), Qdrant Cloud |
 
 ---
@@ -243,9 +245,11 @@ crossVerse/
 │   │   ├── ui/                      # VerseCard, ReligionBadge, GraphCanvas, …
 │   │   ├── LivingHero.tsx           # Auto-loading homepage hero
 │   │   ├── Navbar.tsx               # Navigation with dropdowns
+│   │   ├── PostHogProvider.tsx      # PostHog client initialisation
 │   │   └── SettingsPanel.tsx        # Global preferences
 │   ├── lib/
 │   │   ├── api.ts                   # All API client functions
+│   │   ├── analytics.ts             # Named PostHog events (track card opens, shares, questions…)
 │   │   └── types.ts                 # TypeScript interfaces
 │   ├── Dockerfile
 │   └── fly.toml
@@ -298,3 +302,13 @@ Token spend is reduced 60–80% versus a naive implementation through several te
 | `TOP_K_RESULTS` | `8` | Number of passages retrieved per query |
 | `ALLOWED_ORIGINS` | `http://localhost:3000` | CORS origins (comma-separated) |
 | `RATE_LIMIT` | `30/minute` | Rate limit per IP |
+
+### Frontend env vars (`frontend/.env.local`)
+
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_API_URL` | Backend base URL (default: `http://localhost:8000`) |
+| `NEXT_PUBLIC_POSTHOG_KEY` | PostHog project API key (`phc_…`) |
+| `NEXT_PUBLIC_POSTHOG_HOST` | PostHog host (default: `https://app.posthog.com`) |
+
+> Google Analytics (`G-WB6JPVZHFG`) is hardcoded in `layout.tsx` — no env var needed.
