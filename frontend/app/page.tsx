@@ -170,7 +170,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Traditions ticker */}
-      <div className="overflow-hidden bg-black py-2.5 border-b border-white/10">
+      <div className="overflow-hidden bg-gray-100 dark:bg-black py-2.5 border-b border-gray-200 dark:border-white/10">
         <div className="animate-ticker flex gap-0">
           {[...TRADITIONS, ...TRADITIONS].map(({ name, emoji, color }, i) => (
             <span
@@ -183,8 +183,8 @@ export default function HomePage() {
                 style={{ backgroundColor: color }}
               />
               <span className="text-sm">{emoji}</span>
-              <span className="font-medium text-white/80" style={{ letterSpacing: '0.01em' }}>{name}</span>
-              <span className="text-white/20 pl-2">·</span>
+              <span className="font-medium text-gray-600 dark:text-white/80" style={{ letterSpacing: '0.01em' }}>{name}</span>
+              <span className="text-gray-300 dark:text-white/20 pl-2">·</span>
             </span>
           ))}
         </div>

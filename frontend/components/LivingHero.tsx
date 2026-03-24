@@ -156,12 +156,12 @@ function SkeletonGrid() {
 
   return (
     <div>
-      <p className="mb-5 text-center text-sm italic text-indigo-300 animate-pulse transition-all">
+      <p className="mb-5 text-center text-sm italic text-indigo-500 dark:text-indigo-300 animate-pulse transition-all">
         {LOADING_QUOTES[quoteIdx]}
       </p>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="animate-pulse rounded-2xl border border-white/10 bg-white/5 p-5 h-40" />
+          <div key={i} className="animate-pulse rounded-2xl border border-indigo-100 bg-indigo-50 dark:border-white/10 dark:bg-white/5 p-5 h-40" />
         ))}
       </div>
     </div>
@@ -250,7 +250,7 @@ function CardModal({ religion, perspective, theme, onClose }: CardModalProps) {
       onMouseDown={(e) => { if (e.target === backdropRef.current) onClose(); }}
     >
       <div
-        className="relative flex w-full max-w-lg flex-col rounded-t-3xl sm:rounded-2xl bg-gray-950 shadow-2xl max-h-[90vh] overflow-hidden"
+        className="relative flex w-full max-w-lg flex-col rounded-t-3xl sm:rounded-2xl bg-white dark:bg-gray-950 shadow-2xl max-h-[90vh] overflow-hidden"
         style={{ borderTop: `3px solid ${color}` }}
       >
         {/* Header */}
@@ -258,33 +258,30 @@ function CardModal({ religion, perspective, theme, onClose }: CardModalProps) {
           <div className="flex items-center gap-3">
             <span className="text-2xl">{emoji}</span>
             <div>
-              <p className="font-bold text-white">{religion}</p>
+              <p className="font-bold text-gray-900 dark:text-white">{religion}</p>
               <p className="text-xs capitalize" style={{ color: `${color}cc` }}>on {theme}</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
-            {/* Download */}
             <button
               onClick={handleDownload}
               disabled={sharing}
               title="Download as image"
-              className="flex h-8 w-8 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-40"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white transition-colors disabled:opacity-40"
             >
               <Download size={15} />
             </button>
-            {/* WhatsApp share */}
             <button
               onClick={handleWhatsApp}
               disabled={sharing}
               title="Share on WhatsApp"
-              className="flex h-8 w-8 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-40"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white transition-colors disabled:opacity-40"
             >
               <Share2 size={15} />
             </button>
-            {/* Close */}
             <button
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white transition-colors"
             >
               <X size={16} />
             </button>
@@ -293,12 +290,10 @@ function CardModal({ religion, perspective, theme, onClose }: CardModalProps) {
 
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
-          {/* Reflection */}
-          <p className="text-sm leading-relaxed text-white/85 italic">
+          <p className="text-sm leading-relaxed text-gray-700 dark:text-white/85 italic">
             &ldquo;{perspective.reflection}&rdquo;
           </p>
 
-          {/* Source verses */}
           {perspective.sources.length > 0 && (
             <div>
               <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest" style={{ color: `${color}99` }}>
@@ -308,21 +303,21 @@ function CardModal({ religion, perspective, theme, onClose }: CardModalProps) {
                 {perspective.sources.map((v) => (
                   <div
                     key={v.id}
-                    className="rounded-xl border-l-2 bg-white/5 px-4 py-3"
+                    className="rounded-xl border-l-2 bg-gray-50 dark:bg-white/5 px-4 py-3"
                     style={{ borderLeftColor: color }}
                   >
                     <div className="mb-1.5 flex items-center gap-1.5">
-                      <BookOpen size={11} className="shrink-0 text-white/40" />
-                      <span className="text-xs font-semibold text-white/70">{v.reference}</span>
+                      <BookOpen size={11} className="shrink-0 text-gray-400 dark:text-white/40" />
+                      <span className="text-xs font-semibold text-gray-700 dark:text-white/70">{v.reference}</span>
                       {v.translation && (
-                        <span className="ml-auto text-[10px] text-white/30">{v.translation}</span>
+                        <span className="ml-auto text-[10px] text-gray-400 dark:text-white/30">{v.translation}</span>
                       )}
                     </div>
-                    <p className="text-sm leading-relaxed text-white/80 italic">
+                    <p className="text-sm leading-relaxed text-gray-700 dark:text-white/80 italic">
                       &ldquo;{v.text}&rdquo;
                     </p>
                     {v.book && (
-                      <p className="mt-1.5 text-[10px] text-white/30">
+                      <p className="mt-1.5 text-[10px] text-gray-400 dark:text-white/30">
                         {v.book}{v.chapter ? `, Ch. ${v.chapter}` : ''}{v.verse ? ` v. ${v.verse}` : ''}
                       </p>
                     )}
@@ -332,10 +327,9 @@ function CardModal({ religion, perspective, theme, onClose }: CardModalProps) {
             </div>
           )}
 
-          {/* Quick action */}
           <button
             onClick={handleThemeAsk}
-            className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+            className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 dark:border-white/10 dark:bg-white/5 px-4 py-3 text-left text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white transition-colors"
           >
             <span>What does {religion} say about <span className="font-semibold capitalize">{theme}</span>?</span>
             <ArrowRight size={14} className="shrink-0" />
@@ -343,14 +337,14 @@ function CardModal({ religion, perspective, theme, onClose }: CardModalProps) {
         </div>
 
         {/* Follow-up input */}
-        <div className="border-t border-white/10 px-4 py-4">
-          <form onSubmit={handleAsk} className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-3 py-2 focus-within:border-white/30 transition-colors">
+        <div className="border-t border-gray-100 dark:border-white/10 px-4 py-4">
+          <form onSubmit={handleAsk} className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 dark:border-white/20 dark:bg-white/5 px-3 py-2 focus-within:border-indigo-300 dark:focus-within:border-white/30 transition-colors">
             <input
               type="text"
               value={followUp}
               onChange={(e) => setFollowUp(e.target.value)}
               placeholder={`Ask ${religion} scripture anything…`}
-              className="flex-1 bg-transparent text-sm text-white placeholder-white/30 outline-none"
+              className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 dark:text-white dark:placeholder-white/30 outline-none"
               autoFocus
             />
             <button
@@ -389,7 +383,7 @@ function CardGrid({
           <button
             key={religion}
             onClick={() => onCardClick(religion)}
-            className="block w-full rounded-2xl border bg-white/5 p-5 text-left hover:bg-white/10 transition-colors cursor-pointer card-animate-in"
+            className="block w-full rounded-2xl border bg-white/80 dark:bg-white/5 p-5 text-left hover:bg-white dark:hover:bg-white/10 transition-colors cursor-pointer card-animate-in shadow-sm dark:shadow-none"
             style={{
               borderColor: `${color}44`,
               animationDelay: `${index * 120}ms`,
@@ -397,9 +391,9 @@ function CardGrid({
           >
             <div className="mb-3 flex items-center gap-2">
               <span className="text-xl">{emoji}</span>
-              <span className="text-sm font-semibold text-white/90">{religion}</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white/90">{religion}</span>
             </div>
-            <p className="text-sm text-white/70 leading-relaxed line-clamp-3">
+            <p className="text-sm text-gray-600 dark:text-white/70 leading-relaxed line-clamp-3">
               {perspective.reflection}
             </p>
             {firstSource && (
@@ -462,14 +456,14 @@ export default function LivingHero() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient-to-b from-indigo-950 via-indigo-900 to-indigo-800 px-4 py-10 text-white">
-        <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-violet-600/20 blur-3xl" />
-        <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-indigo-400/20 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-b from-indigo-50 via-white to-indigo-50 dark:from-indigo-950 dark:via-indigo-900 dark:to-indigo-800 px-4 py-10">
+        <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-indigo-200/40 dark:bg-violet-600/20 blur-3xl" />
+        <div className="pointer-events-none absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-indigo-100/60 dark:bg-indigo-400/20 blur-3xl" />
 
         <div className="relative mx-auto max-w-5xl">
           {/* Badge */}
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm backdrop-blur-sm">
-            <Sparkles size={14} className="text-yellow-300" />
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-100/80 text-indigo-700 dark:border-white/20 dark:bg-white/10 dark:text-white px-4 py-1.5 text-sm backdrop-blur-sm">
+            <Sparkles size={14} className="text-yellow-500 dark:text-yellow-300" />
             AI-powered scripture exploration
           </div>
 
@@ -477,46 +471,53 @@ export default function LivingHero() {
           <div className="mb-8">
             {daily ? (
               <>
-                <p className="mb-1 text-sm font-medium uppercase tracking-wider text-indigo-300">
+                <p className="mb-1 text-sm font-medium uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
                   Today, all {traditionCount} traditions speak about:
                 </p>
                 <h1 className="text-3xl font-extrabold capitalize sm:text-4xl md:text-5xl">
-                  <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-yellow-500 to-orange-500 dark:from-yellow-300 dark:to-orange-300 bg-clip-text text-transparent">
                     {daily.theme}
                   </span>
                 </h1>
+                {daily.headline && (
+                  <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 dark:border-white/15 dark:bg-white/10 px-3 py-1.5 backdrop-blur-sm">
+                    <span className="flex h-2 w-2 shrink-0 rounded-full bg-red-500 animate-pulse" />
+                    <span className="text-xs text-red-600 dark:text-white/60 font-medium uppercase tracking-wider">Today in the news</span>
+                    <span className="text-xs text-gray-800 dark:text-white/90 font-medium leading-snug">"{daily.headline}"</span>
+                  </div>
+                )}
                 {formattedDate && (
-                  <p className="mt-2 text-sm text-indigo-300">{formattedDate}</p>
+                  <p className="mt-2 text-sm text-indigo-500 dark:text-indigo-300">{formattedDate}</p>
                 )}
               </>
             ) : (
               <div className="space-y-3">
-                <div className="h-4 w-48 animate-pulse rounded bg-white/20" />
-                <div className="h-10 w-80 animate-pulse rounded bg-white/20" />
+                <div className="h-4 w-48 animate-pulse rounded bg-indigo-200 dark:bg-white/20" />
+                <div className="h-10 w-80 animate-pulse rounded bg-indigo-200 dark:bg-white/20" />
               </div>
             )}
           </div>
 
           {/* Ask box — primary CTA */}
           <form onSubmit={handleAsk} className="mb-10">
-            <div className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 p-2 backdrop-blur-sm focus-within:border-white/40 focus-within:bg-white/15 transition-all shadow-lg">
+            <div className="flex items-center gap-2 rounded-2xl border border-indigo-200 bg-white dark:border-white/20 dark:bg-white/10 p-2 backdrop-blur-sm focus-within:border-indigo-400 dark:focus-within:border-white/40 transition-all shadow-lg">
               <input
                 type="text"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="Ask anything — grief, purpose, forgiveness, what happens after death…"
-                className="flex-1 bg-transparent px-3 py-2 text-sm text-white placeholder-white/50 outline-none sm:text-base"
+                className="flex-1 bg-transparent px-3 py-2 text-sm text-gray-900 placeholder-gray-400 dark:text-white dark:placeholder-white/50 outline-none sm:text-base"
               />
               <button
                 type="submit"
                 disabled={!question.trim()}
-                className="flex shrink-0 items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-indigo-900 hover:bg-indigo-50 disabled:opacity-40 transition-colors shadow"
+                className="flex shrink-0 items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 dark:bg-white dark:text-indigo-900 dark:hover:bg-indigo-50 disabled:opacity-40 transition-colors shadow"
               >
                 <Send size={15} />
                 <span className="hidden sm:inline">Ask Scripture</span>
               </button>
             </div>
-            <p className="mt-2 px-1 text-xs text-indigo-300/80">
+            <p className="mt-2 px-1 text-xs text-indigo-500 dark:text-indigo-300/80">
               Answers from 12 traditions · always cited · never opinionated
             </p>
           </form>
@@ -534,14 +535,14 @@ export default function LivingHero() {
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/fingerprint"
-              className="flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/20 transition-colors backdrop-blur-sm"
+              className="flex items-center gap-2 rounded-xl border border-indigo-300 bg-indigo-600 text-white hover:bg-indigo-700 dark:border-white/30 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 px-5 py-2.5 text-sm font-semibold transition-colors backdrop-blur-sm"
             >
               Find Your Tradition <ArrowRight size={15} />
             </Link>
             <button
               onClick={() => fetchDaily(true)}
               disabled={refreshing}
-              className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white/80 hover:bg-white/10 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl border border-indigo-200 bg-white text-indigo-700 hover:bg-indigo-50 dark:border-white/20 dark:bg-white/5 dark:text-white/80 dark:hover:bg-white/10 px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50"
             >
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
               Different Theme
