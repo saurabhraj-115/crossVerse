@@ -100,8 +100,10 @@ async def daily_briefing(fresh: bool = False) -> DailyResponse:
             # Random offset so Qdrant returns a different page of results
             offset = random.randint(3, 30)
         else:
-            day_of_year = date.today().timetuple().tm_yday
-            theme = THEMES[day_of_year % len(THEMES)]
+            # Hash the date string so the theme order is not predictable
+            import hashlib
+            seed = int(hashlib.md5(today_str.encode()).hexdigest(), 16)
+            theme = THEMES[seed % len(THEMES)]
             offset = 0
 
         query_vector = await embed_query(theme)
