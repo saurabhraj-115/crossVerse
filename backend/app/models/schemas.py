@@ -183,6 +183,7 @@ class DailyResponse(BaseModel):
     theme: str
     date: str
     perspectives: Dict[str, DailyPerspective]
+    headline: Optional[str] = None  # The news headline that inspired today's theme
 
 
 # ---------------------------------------------------------------------------

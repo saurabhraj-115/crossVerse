@@ -217,6 +217,7 @@ export interface DailyResponse {
   theme: string;
   date: string;
   perspectives: Record<Religion, DailyPerspective>;
+  headline?: string | null;
 }
 
 // ---------------------------------------------------------------------------
