@@ -43,3 +43,38 @@
   transform: translateY(0);
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
+
+/* Card entrance — CSS-delay stagger, no JS height side-effects */
+.card-animate-in {
+  animation: cardSlideIn 0.4s ease both;
+}
+
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Traditions ticker */
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.animate-ticker {
+  animation: ticker 30s linear infinite;
+  width: max-content;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* Live dot pulse */
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(1.6); }
+}
+
+.animate-live-dot {
+  animation: livePulse 1.8s ease-in-out infinite;
+}

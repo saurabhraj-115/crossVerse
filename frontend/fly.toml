@@ -1,24 +1,30 @@
-app = "crossverse-frontend"
-primary_region = "iad"
+# fly.toml app configuration file generated for crossverse-frontend on 2026-03-20T21:04:14+05:30
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'crossverse-frontend'
+primary_region = 'iad'
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = 'Dockerfile'
+
   [build.args]
-    # Must match the backend app name below
-    NEXT_PUBLIC_API_URL = "https://crossverse-backend.fly.dev"
+    NEXT_PUBLIC_API_URL = 'https://crossverse-backend.fly.dev'
 
 [env]
-  PORT = "3000"
-  NEXT_PUBLIC_API_URL = "https://crossverse-backend.fly.dev"
+  NEXT_PUBLIC_API_URL = 'https://crossverse-backend.fly.dev'
+  PORT = '3000'
 
 [http_service]
   internal_port = 3000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
 
 [[vm]]
-  memory = "512mb"
-  cpu_kind = "shared"
+  memory = '512mb'
+  cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 512

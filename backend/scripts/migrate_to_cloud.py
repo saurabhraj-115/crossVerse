@@ -16,7 +16,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PayloadSchemaType, PointStruct
 
 COLLECTION = "scriptures"
-BATCH_SIZE = 100
+BATCH_SIZE = 50
 VECTOR_SIZE = 1536
 
 
@@ -25,7 +25,7 @@ def migrate(local_url: str, cloud_url: str, cloud_api_key: str):
     src = QdrantClient(url=local_url, timeout=60, prefer_grpc=False)
 
     print(f"Connecting to Qdrant Cloud at {cloud_url}...")
-    dst = QdrantClient(url=cloud_url, api_key=cloud_api_key, timeout=60, prefer_grpc=False)
+    dst = QdrantClient(url=cloud_url, api_key=cloud_api_key, timeout=120, prefer_grpc=False)
 
     # --- Verify source ---
     src_collections = {c.name for c in src.get_collections().collections}

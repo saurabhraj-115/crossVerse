@@ -139,7 +139,7 @@ export default function VerseCard({ chunk, index, compact = false }: VerseCardPr
       </div>
 
       {/* Reference on its own line so it never fights for space */}
-      <div className="mb-1 flex items-center gap-1 text-xs font-semibold text-gray-600 dark:text-gray-400">
+      <div className="mb-1 flex items-center gap-1 text-xs font-semibold text-gray-600 dark:text-gray-300">
         <BookOpen size={11} className="shrink-0" />
         <span className="truncate">{chunk.reference}</span>
       </div>
@@ -174,7 +174,7 @@ export default function VerseCard({ chunk, index, compact = false }: VerseCardPr
         </div>
       )}
 
-      <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">{chunk.translation}</p>
+      <p className="mt-2 text-xs text-gray-400 dark:text-gray-400">{chunk.translation}</p>
     </div>
   );
 }

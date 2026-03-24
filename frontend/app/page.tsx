@@ -169,6 +169,27 @@ const MOODS = [
 export default function HomePage() {
   return (
     <div className="flex flex-col">
+      {/* Traditions ticker */}
+      <div className="overflow-hidden bg-black py-2.5 border-b border-white/10">
+        <div className="animate-ticker flex gap-0">
+          {[...TRADITIONS, ...TRADITIONS].map(({ name, emoji, color }, i) => (
+            <span
+              key={i}
+              className="flex shrink-0 items-center gap-2 px-6 text-xs"
+            >
+              {/* Pulsating live dot */}
+              <span
+                className="animate-live-dot h-1.5 w-1.5 rounded-full shrink-0"
+                style={{ backgroundColor: color }}
+              />
+              <span className="text-sm">{emoji}</span>
+              <span className="font-medium text-white/80" style={{ letterSpacing: '0.01em' }}>{name}</span>
+              <span className="text-white/20 pl-2">·</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* Living Hero — auto-loads daily briefing */}
       <LivingHero />
 
@@ -253,36 +274,6 @@ export default function HomePage() {
           </p>
           <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {TOOLS_FEATURES.map((f) => <FeatureCard key={f.href} {...f} />)}
-          </div>
-        </div>
-      </section>
-
-      {/* Traditions */}
-      <section className="bg-gray-900 px-4 py-16 text-white">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="mb-3 text-center text-3xl font-bold">Twelve Sacred Traditions</h2>
-          <p className="mb-10 text-center text-gray-400">
-            Authentic scripture, faithfully sourced and embedded for semantic search
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {TRADITIONS.map(({ name, emoji, text, color }) => (
-              <div
-                key={name}
-                className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-4"
-              >
-                <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl"
-                  style={{ backgroundColor: `${color}22` }}
-                >
-                  {emoji}
-                </div>
-                <div className="min-w-0 overflow-hidden">
-                  <div className="truncate font-bold text-white">{name}</div>
-                  <div className="truncate text-sm text-gray-400">{text}</div>
-                </div>
-                <div className="ml-auto h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
-              </div>
-            ))}
           </div>
         </div>
       </section>

@@ -56,18 +56,18 @@ export const RELIGION_COLORS: Record<Religion, string> = {
 };
 
 export const RELIGION_BG: Record<Religion, string> = {
-  Christianity: 'bg-blue-100 text-blue-800 border-blue-200',
-  Islam: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  Hinduism: 'bg-amber-100 text-amber-800 border-amber-200',
-  Buddhism: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  Judaism: 'bg-purple-100 text-purple-800 border-purple-200',
-  Sikhism: 'bg-teal-100 text-teal-800 border-teal-200',
-  Jainism: 'bg-orange-100 text-orange-800 border-orange-200',
-  Zoroastrianism: 'bg-amber-100 text-amber-800 border-amber-300',
-  Confucianism: 'bg-stone-100 text-stone-800 border-stone-200',
-  Taoism: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-  Bahai: 'bg-purple-100 text-purple-900 border-purple-300',
-  Shinto: 'bg-pink-100 text-pink-800 border-pink-200',
+  Christianity: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700',
+  Islam: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700',
+  Hinduism: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-700',
+  Buddhism: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/40 dark:text-yellow-300 dark:border-yellow-700',
+  Judaism: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700',
+  Sikhism: 'bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-900/40 dark:text-teal-300 dark:border-teal-700',
+  Jainism: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-700',
+  Zoroastrianism: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-700',
+  Confucianism: 'bg-stone-100 text-stone-800 border-stone-200 dark:bg-stone-900/40 dark:text-stone-300 dark:border-stone-600',
+  Taoism: 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700',
+  Bahai: 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700',
+  Shinto: 'bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/40 dark:text-pink-300 dark:border-pink-700',
 };
 
 export const RELIGION_EMOJI: Record<Religion, string> = {

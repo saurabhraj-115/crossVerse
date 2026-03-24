@@ -31,8 +31,9 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across twelv
 
 | Feature | Description |
 |---------|-------------|
-| **Living Hero** | Homepage auto-loads today's daily theme and shows cards for every tradition that returned passages |
-| **Ask** | Scripture-grounded Q&A with citations — Simple, Scholar, or Child mode |
+| **Traditions Ticker** | Animated marquee just below the navbar shows all 12 live traditions with pulsating color dots |
+| **Living Hero** | Homepage auto-loads today's daily theme; clicking a tradition card opens a per-card modal with full reflection, citations, and an inline follow-up chat input |
+| **Ask** | Scripture-grounded Q&A with citations — Simple, Scholar, or Child mode; pre-filtered when navigated to from a tradition card |
 | **Compare** | Side-by-side view of what each tradition says about any topic |
 | **Debate** | Each tradition's scriptures respond to a question independently |
 | **Universal Truth** | Enter any concept — find the single truth all 12 traditions agree on |
@@ -48,7 +49,7 @@ CrossVerse is an AI-powered platform for exploring sacred scripture across twelv
 | **Study Plans** | AI-generated multi-day study plans on any topic |
 | **Voice Input** | Speak your question — mic transcription built in |
 | **Share & Cite** | Native OS share sheet + Chicago / MLA / SBL citation formats per verse |
-| **Dark Mode** | Full dark mode across all pages |
+| **Dark Mode** | Full dark mode across all pages — religion badges, source cards, and verse text all tuned for legibility |
 
 ---
 
