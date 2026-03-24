@@ -141,12 +141,29 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/80">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 text-white text-sm font-bold shadow-sm group-hover:shadow-md transition-shadow">
-            CV
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center">
+            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-9 w-9 drop-shadow-sm group-hover:drop-shadow-md transition-all">
+              <defs>
+                <linearGradient id="cvGrad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#7C3AED"/>
+                  <stop offset="100%" stopColor="#4F46E5"/>
+                </linearGradient>
+              </defs>
+              {/* Outer circle */}
+              <circle cx="18" cy="18" r="17" fill="url(#cvGrad)"/>
+              {/* Six-fold radial lines — one per tradition */}
+              <line x1="18" y1="4"  x2="18" y2="32" stroke="white" strokeWidth="1.2" strokeOpacity="0.25"/>
+              <line x1="4"  y1="11" x2="32" y2="25" stroke="white" strokeWidth="1.2" strokeOpacity="0.25"/>
+              <line x1="4"  y1="25" x2="32" y2="11" stroke="white" strokeWidth="1.2" strokeOpacity="0.25"/>
+              {/* Inner hex ring */}
+              <polygon points="18,8 24.2,11.5 24.2,18.5 18,22 11.8,18.5 11.8,11.5" fill="none" stroke="white" strokeWidth="1.3" strokeOpacity="0.5"/>
+              {/* Centre dot */}
+              <circle cx="18" cy="15" r="3.2" fill="white" fillOpacity="0.95"/>
+            </svg>
           </div>
-          <span className="font-bold text-gray-900 text-lg dark:text-white">
-            Cross<span className="text-indigo-600 dark:text-indigo-400">Verse</span>
+          <span className="font-extrabold text-gray-900 text-lg tracking-tight dark:text-white">
+            Cross<span className="bg-gradient-to-r from-violet-600 to-indigo-500 bg-clip-text text-transparent">Verse</span>
           </span>
         </Link>
 

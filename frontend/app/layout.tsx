@@ -15,6 +15,10 @@ export const metadata: Metadata = {
     'religious texts', 'scripture', 'Bible', 'Quran', 'Bhagavad Gita',
     'Dhammapada', 'Guru Granth Sahib', 'AI', 'RAG', 'comparative religion',
   ],
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
