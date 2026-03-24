@@ -148,7 +148,7 @@ export default function FingerprintPage() {
         <div className="flex flex-col items-center justify-center py-20 gap-4 text-gray-500 dark:text-gray-400">
           <Loader2 size={32} className="animate-spin text-violet-600" />
           <p className="font-medium">Analyzing your worldview…</p>
-          <p className="text-sm">Comparing against 6 traditions</p>
+          <p className="text-sm">Comparing against 12 traditions</p>
         </div>
       )}
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import logging
 import re
@@ -21,6 +22,8 @@ from app.core.llm import chat_complete
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+_cache: Dict[str, UniversalResponse] = {}
 
 SYSTEM_PROMPT = (
     "You are a scholar of world religions. Given verses from multiple traditions on one concept, "
@@ -55,6 +58,13 @@ async def find_universal_truth(request: UniversalRequest) -> UniversalResponse:
     """
     try:
         religions = request.religions or SUPPORTED_RELIGIONS
+        cache_key = hashlib.sha256(
+            f"{request.concept}:{sorted(religions)}".encode()
+        ).hexdigest()[:16]
+
+        if cache_key in _cache:
+            return _cache[cache_key]
+
         query_vector = await embed_query(request.concept)
 
         tasks = [_search_for_tradition(religion, query_vector) for religion in religions]
@@ -83,7 +93,7 @@ async def find_universal_truth(request: UniversalRequest) -> UniversalResponse:
             {"role": "user", "content": user_message},
         ]
 
-        raw = await chat_complete(messages, temperature=0.3)
+        raw = await chat_complete(messages, temperature=0.3, max_tokens=600)
 
         match = re.search(r"\{.*\}", raw, re.DOTALL)
         if not match:
@@ -99,12 +109,16 @@ async def find_universal_truth(request: UniversalRequest) -> UniversalResponse:
                 reflection=expr.get("reflection", ""),
             )
 
-        return UniversalResponse(
+        response = UniversalResponse(
             concept=request.concept,
             universal_truth=parsed.get("universal_truth", ""),
             tradition_expressions=tradition_expressions,
             sources=all_chunks,
         )
+        if len(_cache) > 500:
+            _cache.clear()
+        _cache[cache_key] = response
+        return response
 
     except HTTPException:
         raise

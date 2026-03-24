@@ -46,7 +46,11 @@ async def get_embeddings_batch(texts: list[str]) -> list[list[float]]:
     return [item.embedding for item in sorted(response.data, key=lambda x: x.index)]
 
 
-async def chat_complete(messages: list[dict], temperature: float = 0.2) -> str:
+async def chat_complete(
+    messages: list[dict],
+    temperature: float = 0.2,
+    max_tokens: int = 2048,
+) -> str:
     """Call Claude and return the assistant message content."""
     settings = get_settings()
     client = get_anthropic()
@@ -62,7 +66,7 @@ async def chat_complete(messages: list[dict], temperature: float = 0.2) -> str:
 
     response = await client.messages.create(
         model=settings.llm_model,
-        max_tokens=2048,
+        max_tokens=max_tokens,
         temperature=temperature,
         system=system_prompt,
         messages=conversation,

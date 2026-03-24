@@ -28,7 +28,7 @@ const CORE_FEATURES = [
   {
     icon: Scale,
     title: 'Compare Traditions',
-    description: 'See what all six traditions say about the same topic — side by side.',
+    description: 'See what all twelve traditions say about the same topic — side by side.',
     href: '/compare',
     color: 'text-violet-600 dark:text-violet-400',
     bg: 'bg-violet-50 dark:bg-violet-900/30',
@@ -63,7 +63,7 @@ const EXPLORE_FEATURES = [
   {
     icon: Calendar,
     title: 'Daily Briefing',
-    description: "A new theme every day, with reflections from all six traditions. Start your morning with scripture.",
+    description: "A new theme every day, with reflections from all twelve traditions. Start your morning with scripture.",
     href: '/daily',
     color: 'text-amber-600 dark:text-amber-400',
     bg: 'bg-amber-50 dark:bg-amber-900/30',
@@ -120,6 +120,12 @@ const TRADITIONS = [
   { name: 'Buddhism', emoji: '☸️', text: 'Dhammapada', color: '#EAB308' },
   { name: 'Judaism', emoji: '✡️', text: 'Torah / Tanakh', color: '#8B5CF6' },
   { name: 'Sikhism', emoji: '🪯', text: 'Guru Granth Sahib', color: '#14B8A6' },
+  { name: 'Jainism', emoji: '🕊️', text: 'Agamas / Tattvartha Sutra', color: '#EA580C' },
+  { name: 'Zoroastrianism', emoji: '🔥', text: 'Avesta / Gathas', color: '#D97706' },
+  { name: 'Confucianism', emoji: '📜', text: 'Analects', color: '#78716C' },
+  { name: 'Taoism', emoji: '☯️', text: 'Tao Te Ching', color: '#059669' },
+  { name: 'Bahai', emoji: '⭐', text: 'Kitáb-i-Aqdas', color: '#9333EA' },
+  { name: 'Shinto', emoji: '⛩️', text: 'Kojiki / Nihongi', color: '#EC4899' },
 ];
 
 function FeatureCard({ icon: Icon, title, description, href, color, bg }: {
@@ -254,7 +260,7 @@ export default function HomePage() {
       {/* Traditions */}
       <section className="bg-gray-900 px-4 py-16 text-white">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-3 text-center text-3xl font-bold">Six Sacred Traditions</h2>
+          <h2 className="mb-3 text-center text-3xl font-bold">Twelve Sacred Traditions</h2>
           <p className="mb-10 text-center text-gray-400">
             Authentic scripture, faithfully sourced and embedded for semantic search
           </p>

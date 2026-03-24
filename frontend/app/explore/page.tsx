@@ -29,7 +29,7 @@ export default function ExplorePage() {
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Topic Explorer</h1>
         <p className="mt-2 text-gray-500 dark:text-gray-400">
-          Browse curated topics and see what all six traditions say. Click any topic to compare.
+          Browse curated topics and see what all twelve traditions say. Click any topic to compare.
         </p>
       </div>
 
@@ -96,7 +96,7 @@ export default function ExplorePage() {
         <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
           <li className="flex items-start gap-2">
             <span className="mt-0.5 text-emerald-500">•</span>
-            <span><strong>Compare</strong> — See relevant verses from all 6 traditions side-by-side for this topic</span>
+            <span><strong>Compare</strong> — See relevant verses from all 12 traditions side-by-side for this topic</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="mt-0.5 text-rose-500">•</span>

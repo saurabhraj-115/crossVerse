@@ -43,31 +43,27 @@ function SkeletonGrid() {
   );
 }
 
-function CardGrid({
-  daily,
-  visibleCards,
-}: {
-  daily: DailyResponse;
-  visibleCards: number;
-}) {
+function CardGrid({ daily }: { daily: DailyResponse }) {
+  // Only render traditions that have perspectives, preserving canonical order
+  const entries = ALL_RELIGIONS.filter((r) => daily.perspectives[r] != null);
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {ALL_RELIGIONS.map((religion, index) => {
-        const perspective = daily.perspectives[religion];
-        if (!perspective) return null;
+      {entries.map((religion, index) => {
+        const perspective = daily.perspectives[religion]!;
         const color = RELIGION_COLORS[religion];
         const emoji = RELIGION_EMOJI[religion];
         const firstSource = perspective.sources[0];
-        const isVisible = index < visibleCards;
 
         return (
           <Link
             key={religion}
             href="/daily"
-            className={`block rounded-2xl border bg-white/5 p-5 hover:bg-white/10 transition-colors cursor-pointer ${
-              isVisible ? 'verse-card-visible' : 'verse-card-enter'
-            }`}
-            style={{ borderColor: `${color}44` }}
+            className="block rounded-2xl border bg-white/5 p-5 hover:bg-white/10 transition-colors cursor-pointer card-animate-in"
+            style={{
+              borderColor: `${color}44`,
+              animationDelay: `${index * 120}ms`,
+            }}
           >
             <div className="mb-3 flex items-center gap-2">
               <span className="text-xl">{emoji}</span>
@@ -91,24 +87,17 @@ function CardGrid({
 export default function LivingHero() {
   const [daily, setDaily] = useState<DailyResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [visibleCards, setVisibleCards] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
   async function fetchDaily(fresh = false) {
-    if (fresh) setRefreshing(true);
+    if (fresh) {
+      setRefreshing(true);
+      setDaily(null); // immediately clear so title resets while loading
+    }
     setLoading(true);
-    setVisibleCards(0);
     try {
       const data = await getDailyBriefing(fresh);
       setDaily(data);
-      // Stagger cards in after data lands
-      let count = 0;
-      const total = Object.keys(data.perspectives).length;
-      const interval = setInterval(() => {
-        count += 1;
-        setVisibleCards(count);
-        if (count >= total) clearInterval(interval);
-      }, 150);
     } catch {
       // silently fail — hero degrades gracefully
     } finally {
@@ -129,6 +118,8 @@ export default function LivingHero() {
       })
     : null;
 
+  const traditionCount = daily ? Object.keys(daily.perspectives).length : null;
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-indigo-950 via-indigo-900 to-indigo-800 px-4 py-10 text-white">
       <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-violet-600/20 blur-3xl" />
@@ -146,7 +137,7 @@ export default function LivingHero() {
           {daily ? (
             <>
               <p className="mb-1 text-sm font-medium uppercase tracking-wider text-indigo-300">
-                Today, all {Object.keys(daily.perspectives).length} traditions speak about:
+                Today, all {traditionCount} traditions speak about:
               </p>
               <h1 className="text-4xl font-extrabold capitalize sm:text-5xl">
                 <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
@@ -170,7 +161,7 @@ export default function LivingHero() {
           {loading ? (
             <SkeletonGrid />
           ) : daily ? (
-            <CardGrid daily={daily} visibleCards={visibleCards} />
+            <CardGrid daily={daily} />
           ) : null}
         </div>
 

@@ -43,7 +43,7 @@ async def fact_check(request: FactCheckRequest) -> FactCheckResponse:
         chunks: List[ScriptureChunk] = await _search_qdrant(
             query_vector,
             [request.religion],
-            top_k=10,
+            top_k=6,
         )
 
         if not chunks:
@@ -67,7 +67,7 @@ async def fact_check(request: FactCheckRequest) -> FactCheckResponse:
             {"role": "user", "content": user_message},
         ]
 
-        raw = await chat_complete(messages, temperature=0.2)
+        raw = await chat_complete(messages, temperature=0.2, max_tokens=500)
 
         # Extract verdict token
         m = VERDICT_PATTERN.search(raw)

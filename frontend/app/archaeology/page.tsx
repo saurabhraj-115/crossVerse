@@ -59,7 +59,7 @@ export default function ArchaeologyPage() {
         </div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Concept Archaeology</h1>
         <p className="mt-2 text-gray-500 dark:text-gray-400">
-          Trace how a concept developed across all six sacred traditions. Discover shared roots and divergences.
+          Trace how a concept developed across all twelve sacred traditions. Discover shared roots and divergences.
         </p>
       </div>
 

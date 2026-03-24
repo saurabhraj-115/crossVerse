@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
+import re
 from typing import Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException
@@ -26,64 +28,80 @@ SYSTEM_PROMPT = (
 )
 
 
-async def _get_ethics_perspective(
-    dilemma: str,
-    religion: str,
-    query_vector: List[float],
-) -> tuple[str, str, List[ScriptureChunk]]:
-    """Retrieve and generate ethics perspective for one religion."""
-    chunks = await _search_qdrant(query_vector, [religion], top_k=6)
-
-    if not chunks:
-        return religion, f"No relevant scripture passages from {religion} found for this dilemma.", []
-
-    context = build_context_block(chunks)
-    user_message = (
-        f"Scripture passages from {religion}:\n\n{context}\n\n"
-        f"How does {religion} scripture reason through this ethical dilemma? "
-        f"Use ONLY provided passages, cite every claim. "
-        f"Dilemma: {dilemma}"
-    )
-
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": user_message},
-    ]
-
-    reasoning = await chat_complete(messages, temperature=0.3)
-    return religion, reasoning, chunks
-
-
 @router.post("/ethics", response_model=EthicsResponse, summary="Ethical dilemma across traditions")
 async def ethics_perspectives(request: EthicsRequest) -> EthicsResponse:
     """
-    For each selected religion, retrieves scripture and asks Claude to reason
-    through the ethical dilemma. All religions are queried in parallel.
+    For each selected religion, retrieves scripture in parallel, then makes a single
+    LLM call asking Claude to reason through the dilemma for all traditions at once.
     """
     try:
         religions = request.religions or SUPPORTED_RELIGIONS
         query_vector = await embed_query(request.dilemma)
 
+        # Fetch scripture for all traditions in parallel
         tasks = [
-            _get_ethics_perspective(request.dilemma, religion, query_vector)
+            _search_qdrant(query_vector, [religion], top_k=6)
             for religion in religions
         ]
-
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        perspectives: Dict[str, str] = {}
-        sources: Dict[str, List[ScriptureChunk]] = {}
-
+        per_religion_chunks: Dict[str, List[ScriptureChunk]] = {}
         for i, result in enumerate(results):
             religion = religions[i]
             if isinstance(result, Exception):
-                logger.warning("Ethics: error for %s: %s", religion, result)
-                perspectives[religion] = f"Unable to retrieve ethics perspective for {religion} at this time."
-                sources[religion] = []
+                logger.warning("Ethics: search error for %s: %s", religion, result)
+                per_religion_chunks[religion] = []
             else:
-                rel, reasoning, chunks = result
-                perspectives[rel] = reasoning
-                sources[rel] = chunks
+                per_religion_chunks[religion] = result
+
+        # Build a single combined message with all tradition blocks
+        tradition_blocks = []
+        for religion in religions:
+            chunks = per_religion_chunks[religion]
+            if chunks:
+                ctx = build_context_block(chunks)
+                tradition_blocks.append(f"--- {religion} passages ---\n{ctx}")
+            else:
+                tradition_blocks.append(f"--- {religion} passages ---\n(No passages found)")
+
+        user_msg = (
+            "Ethical dilemma: " + request.dilemma + "\n\n"
+            + "\n\n".join(tradition_blocks)
+            + "\n\nReason through the dilemma for each tradition using ONLY its passages. "
+              'Return ONLY valid JSON (no markdown) where each key is a tradition name and '
+              'value is the reasoning string. '
+              'Example format: {"Christianity": "...", "Islam": "..."}'
+        )
+
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_msg},
+        ]
+
+        raw = await chat_complete(messages, temperature=0.3, max_tokens=1500)
+
+        # Parse the JSON response
+        perspectives: Dict[str, str] = {}
+        try:
+            m = re.search(r"\{.*\}", raw, re.DOTALL)
+            if m:
+                parsed = json.loads(m.group(0))
+                for religion in religions:
+                    perspectives[religion] = parsed.get(
+                        religion,
+                        f"No response generated for {religion}.",
+                    )
+            else:
+                raise ValueError("No JSON object found in LLM response")
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.warning("Ethics: JSON parse failed (%s), falling back to error messages", exc)
+            for religion in religions:
+                perspectives[religion] = f"Unable to parse ethics perspective for {religion}."
+
+        sources: Dict[str, List[ScriptureChunk]] = {
+            religion: per_religion_chunks.get(religion, [])
+            for religion in religions
+        }
 
         return EthicsResponse(
             dilemma=request.dilemma,

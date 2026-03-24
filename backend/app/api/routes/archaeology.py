@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List
+from typing import Dict, List
 
 from fastapi import APIRouter, HTTPException
 
@@ -13,6 +13,8 @@ from app.core.llm import chat_complete
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+_cache: Dict[str, ArchaeologyResponse] = {}
 
 SYSTEM_PROMPT = (
     "You are a scholar of comparative religion and conceptual history. "
@@ -34,13 +36,17 @@ async def archaeology(request: ArchaeologyRequest) -> ArchaeologyResponse:
     conceptual lineage, shared roots, and key differences across traditions.
     """
     try:
+        cache_key = request.concept.lower().strip()
+        if cache_key in _cache:
+            return _cache[cache_key]
+
         query_vector = await embed_query(request.concept)
 
         # Search across all traditions at once for breadth
         chunks: List[ScriptureChunk] = await _search_qdrant(
             query_vector,
             religions=None,  # all traditions
-            top_k=18,
+            top_k=12,
         )
 
         if not chunks:
@@ -63,13 +69,17 @@ async def archaeology(request: ArchaeologyRequest) -> ArchaeologyResponse:
             {"role": "user", "content": user_message},
         ]
 
-        analysis = await chat_complete(messages, temperature=0.3)
+        analysis = await chat_complete(messages, temperature=0.3, max_tokens=1200)
 
-        return ArchaeologyResponse(
+        response = ArchaeologyResponse(
             concept=request.concept,
             analysis=analysis,
             sources=chunks,
         )
+        if len(_cache) > 200:
+            _cache.clear()
+        _cache[cache_key] = response
+        return response
 
     except Exception as exc:
         logger.exception("Error in /archaeology: %s", exc)

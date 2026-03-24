@@ -308,7 +308,7 @@ export default function QueryChat() {
                 </h2>
                 <p className="mx-auto max-w-sm text-sm text-gray-500 dark:text-gray-400">
                   You don't need a religious question. Describe something real —
-                  scripture from six traditions will speak to it.
+                  scripture from twelve traditions will speak to it.
                 </p>
               </div>
 

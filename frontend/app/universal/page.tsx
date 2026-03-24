@@ -55,11 +55,11 @@ export default function UniversalPage() {
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm backdrop-blur-sm">
             <Sparkles size={14} className="text-yellow-300" />
-            117,000+ verses · 6 traditions
+            117,000+ verses · 12 traditions
           </div>
           <h1 className="mb-3 text-4xl font-extrabold sm:text-5xl">Universal Truth</h1>
           <p className="text-indigo-200">
-            What do all six traditions agree on? Enter any concept and find out.
+            What do all twelve traditions agree on? Enter any concept and find out.
           </p>
         </div>
       </div>
@@ -103,7 +103,7 @@ export default function UniversalPage() {
         {loading && (
           <div className="py-16 text-center">
             <p className="animate-pulse text-lg italic text-gray-500 dark:text-gray-400">
-              Searching 117,000+ verses across 6 traditions…
+              Searching 117,000+ verses across 12 traditions…
             </p>
           </div>
         )}
