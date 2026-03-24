@@ -73,7 +73,7 @@ export default function GraphPage() {
           </div>
 
           {/* Concept input */}
-          <div className="flex flex-1 min-w-48 gap-2">
+          <div className="flex flex-1 min-w-0 gap-2">
             <input
               type="text"
               value={concept}
@@ -164,9 +164,9 @@ export default function GraphPage() {
           />
         )}
 
-        {/* Side panel */}
+        {/* Side panel — full screen on mobile, sidebar on sm+ */}
         {selectedNode && (
-          <div className="absolute right-0 top-0 h-full w-80 overflow-y-auto border-l border-gray-200 bg-white p-4 shadow-xl dark:border-gray-700 dark:bg-gray-900">
+          <div className="fixed inset-0 z-40 overflow-y-auto border-l border-gray-200 bg-white p-4 shadow-xl dark:border-gray-700 dark:bg-gray-900 sm:absolute sm:inset-auto sm:right-0 sm:top-0 sm:h-full sm:w-80">
             <div className="mb-3 flex items-center justify-between">
               <span className="font-bold text-gray-800 dark:text-gray-200 text-sm">Verse Detail</span>
               <button

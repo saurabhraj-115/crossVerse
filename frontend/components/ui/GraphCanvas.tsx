@@ -606,8 +606,8 @@ export default function GraphCanvas({
         <div
           className="absolute z-50 w-72 rounded-2xl p-3.5 shadow-2xl"
           style={{
-            left: tooltip.x + 18,
-            top: Math.max(8, tooltip.y - 60),
+            left: Math.min(tooltip.x + 18, (containerRef.current?.clientWidth ?? 9999) - 300),
+            top: Math.min(Math.max(8, tooltip.y - 60), (containerRef.current?.clientHeight ?? 9999) - 220),
             background: isDark ? 'rgba(10,10,20,0.97)' : 'rgba(255,255,255,0.97)',
             border: `1px solid ${RELIGION_COLORS[tooltip.node.religion as Religion]}40`,
             backdropFilter: 'blur(12px)',

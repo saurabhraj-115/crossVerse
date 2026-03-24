@@ -139,7 +139,7 @@ export default function LivingHero() {
               <p className="mb-1 text-sm font-medium uppercase tracking-wider text-indigo-300">
                 Today, all {traditionCount} traditions speak about:
               </p>
-              <h1 className="text-4xl font-extrabold capitalize sm:text-5xl">
+              <h1 className="text-3xl font-extrabold capitalize sm:text-4xl md:text-5xl">
                 <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
                   {daily.theme}
                 </span>

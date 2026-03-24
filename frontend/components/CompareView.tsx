@@ -112,7 +112,7 @@ export default function CompareView() {
             Religions to compare{' '}
             <span className="font-normal text-gray-400 dark:text-gray-500">(select 2–6)</span>
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
             {ALL_RELIGIONS.map((religion) => {
               const color = RELIGION_COLORS[religion];
               const selected = selectedReligions.includes(religion);
@@ -121,7 +121,7 @@ export default function CompareView() {
                   key={religion}
                   onClick={() => toggleReligion(religion)}
                   className={clsx(
-                    'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all',
+                    'flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all',
                     selected
                       ? 'border-current text-white shadow-sm'
                       : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-600'

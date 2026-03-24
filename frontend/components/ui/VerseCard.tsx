@@ -27,7 +27,7 @@ function CitationPopover({ chunk, onClose }: { chunk: ScriptureChunk; onClose: (
   };
 
   return (
-    <div className="absolute right-0 top-8 z-50 w-80 rounded-xl border border-gray-200 bg-white p-4 shadow-xl dark:border-gray-700 dark:bg-gray-900">
+    <div className="absolute right-0 top-8 z-50 w-[min(320px,calc(100vw-32px))] rounded-xl border border-gray-200 bg-white p-4 shadow-xl dark:border-gray-700 dark:bg-gray-900">
       <div className="mb-3 flex items-center justify-between">
         <span className="text-sm font-bold text-gray-800 dark:text-gray-200">Citation Formats</span>
         <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">✕</button>

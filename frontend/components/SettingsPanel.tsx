@@ -56,7 +56,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
       <div
         ref={panelRef}
         className={clsx(
-          'fixed right-0 top-0 z-50 flex h-full w-80 flex-col border-l border-gray-200 bg-white shadow-2xl transition-transform duration-300 dark:border-gray-800 dark:bg-gray-950',
+          'fixed right-0 top-0 z-50 flex h-full w-full sm:w-80 flex-col border-l border-gray-200 bg-white shadow-2xl transition-transform duration-300 dark:border-gray-800 dark:bg-gray-950',
           open ? 'translate-x-0' : 'translate-x-full'
         )}
       >
@@ -68,14 +68,14 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200 transition-colors"
+            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200 transition-colors"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6">
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
 
           {/* Religion filter */}
           <section>
@@ -90,11 +90,11 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 {allSelected ? 'Clear all' : 'Select all'}
               </button>
             </div>
-            <p className="mb-4 text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+            <p className="mb-4 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
               These traditions are pre-selected on every page. You can still change them per page without affecting this setting.
             </p>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {ALL_RELIGIONS.map((r) => {
                 const active = globalReligions.includes(r);
                 const color  = RELIGION_COLORS[r];
@@ -103,14 +103,14 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                     key={r}
                     onClick={() => toggle(r)}
                     className={clsx(
-                      'flex w-full items-center gap-3 rounded-xl border px-3.5 py-2.5 text-left text-sm font-medium transition-all',
+                      'flex w-full items-center gap-2.5 rounded-lg border px-3 py-2 text-left text-sm font-medium transition-all',
                       active
                         ? 'border-transparent text-white shadow-sm'
-                        : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:border-gray-600'
+                        : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-gray-500'
                     )}
                     style={active ? { backgroundColor: color, boxShadow: `0 2px 8px ${color}55` } : {}}
                   >
-                    <span className="text-base">{RELIGION_EMOJI[r]}</span>
+                    <span className="text-sm">{RELIGION_EMOJI[r]}</span>
                     <span>{r}</span>
                     {!active && (
                       <span className="ml-auto text-[10px] font-normal text-gray-400 dark:text-gray-600">off</span>

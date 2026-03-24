@@ -237,53 +237,56 @@ export default function QueryChat() {
   return (
     <div className="flex h-full flex-col">
       {/* Controls bar */}
-      <div className="border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-4">
-          {/* Mode toggle — 3-way */}
-          <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
-            {([
-              { key: 'child', label: 'Child', Icon: Baby },
-              { key: 'simple', label: 'Simple', Icon: MessageCircle },
-              { key: 'scholar', label: 'Scholar', Icon: GraduationCap },
-            ] as { key: QueryMode; label: string; Icon: React.ElementType }[]).map(({ key, label, Icon }) => (
-              <button
-                key={key}
-                onClick={() => setMode(key)}
-                className={clsx(
-                  'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
-                  mode === key
-                    ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-gray-100'
-                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                )}
-              >
-                <Icon size={13} />
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* Language selector */}
-          <div className="flex items-center gap-1.5">
-            <Globe size={13} className="text-gray-400" />
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="rounded-md border border-gray-200 bg-white py-1 pl-2 pr-6 text-xs text-gray-700 focus:border-indigo-400 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
-            >
-              {['English','Spanish','French','German','Arabic','Hindi','Portuguese','Mandarin','Bengali','Urdu'].map((lang) => (
-                <option key={lang} value={lang}>{lang}</option>
+      <div className="border-b border-gray-200 bg-white px-4 py-2 dark:border-gray-800 dark:bg-gray-900">
+        <div className="mx-auto max-w-3xl space-y-2">
+          {/* Row 1: mode + language */}
+          <div className="flex items-center gap-3">
+            {/* Mode toggle — 3-way */}
+            <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
+              {([
+                { key: 'child', label: 'Child', Icon: Baby },
+                { key: 'simple', label: 'Simple', Icon: MessageCircle },
+                { key: 'scholar', label: 'Scholar', Icon: GraduationCap },
+              ] as { key: QueryMode; label: string; Icon: React.ElementType }[]).map(({ key, label, Icon }) => (
+                <button
+                  key={key}
+                  onClick={() => setMode(key)}
+                  className={clsx(
+                    'flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors',
+                    mode === key
+                      ? 'bg-white text-gray-900 shadow-sm dark:bg-gray-700 dark:text-gray-100'
+                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                  )}
+                >
+                  <Icon size={13} />
+                  <span className="hidden xs:inline sm:inline">{label}</span>
+                </button>
               ))}
-            </select>
+            </div>
+
+            {/* Language selector */}
+            <div className="flex items-center gap-1.5">
+              <Globe size={13} className="shrink-0 text-gray-400" />
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="rounded-md border border-gray-200 bg-white py-1 pl-2 pr-6 text-xs text-gray-700 focus:border-indigo-400 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+              >
+                {['English','Spanish','French','German','Arabic','Hindi','Portuguese','Mandarin','Bengali','Urdu'].map((lang) => (
+                  <option key={lang} value={lang}>{lang}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Religion filters */}
-          <div className="flex flex-wrap gap-1">
+          {/* Row 2: religion filters — horizontal scroll on mobile */}
+          <div className="flex gap-1 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
             {ALL_RELIGIONS.map((religion) => (
               <button
                 key={religion}
                 onClick={() => toggleReligion(religion)}
                 className={clsx(
-                  'rounded-full border px-2 py-0.5 text-xs font-medium transition-colors',
+                  'shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium transition-colors',
                   selectedReligions.includes(religion)
                     ? 'border-indigo-400 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 dark:border-indigo-600'
                     : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-600'
@@ -383,7 +386,7 @@ export default function QueryChat() {
               placeholder="Ask a question about scripture… (Enter to send, Shift+Enter for new line)"
               rows={1}
               className="flex-1 resize-none bg-transparent px-2 py-1 text-sm text-gray-900 placeholder-gray-400 outline-none dark:text-gray-100 dark:placeholder-gray-500"
-              style={{ maxHeight: '120px' }}
+              style={{ maxHeight: '100px' }}
               disabled={loading}
             />
             <button
