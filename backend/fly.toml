@@ -1,24 +1,23 @@
-app = "crossverse-backend"
-primary_region = "iad"
+# fly.toml app configuration file generated for crossverse-backend on 2026-03-20T20:55:07+05:30
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'crossverse-backend'
+primary_region = 'iad'
 
 [build]
-  dockerfile = "Dockerfile"
-
-[env]
-  # QDRANT_URL is set via `fly secrets set` — not hardcoded here
-  # Options:
-  #   Laptop tunnel:  QDRANT_URL = "https://your-tunnel.trycloudflare.com"
-  #   Fly private:    QDRANT_HOST = "crossverse-qdrant.internal", QDRANT_PORT = "6333"
-  #   Qdrant Cloud:   QDRANT_URL = "https://xyz.us-east-1-0.aws.cloud.qdrant.io"
+  dockerfile = 'Dockerfile'
 
 [http_service]
   internal_port = 8000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
 
 [[vm]]
-  memory = "1gb"
-  cpu_kind = "shared"
+  memory = '1gb'
+  cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 1024

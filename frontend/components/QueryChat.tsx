@@ -90,13 +90,13 @@ function detectReligions(text: string): Religion[] {
   return Array.from(detected);
 }
 
-export default function QueryChat({ initialQuestion }: { initialQuestion?: string } = {}) {
+export default function QueryChat({ initialQuestion, initialReligions }: { initialQuestion?: string; initialReligions?: Religion[] } = {}) {
   const { globalReligions } = useSettings();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<QueryMode>('simple');
-  const [selectedReligions, setSelectedReligions] = useState<Religion[]>(globalReligions);
+  const [selectedReligions, setSelectedReligions] = useState<Religion[]>(initialReligions ?? globalReligions);
   const [language, setLanguage] = useState<string>('English');
   const [error, setError] = useState<string | null>(null);
   const [listening, setListening] = useState(false);

@@ -49,7 +49,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         {/* Sources */}
         {!isUser && message.sources && message.sources.length > 0 && (
           <div className="w-full space-y-2">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide dark:text-gray-400">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide dark:text-gray-300">
               Sources ({message.sources.length})
             </p>
             <div className="grid gap-2 sm:grid-cols-2">
