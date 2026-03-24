@@ -9,7 +9,7 @@ from app.models.schemas import ArchaeologyRequest, ArchaeologyResponse, Scriptur
 from app.services.embeddings import embed_query
 from app.services.rag import _search_qdrant
 from app.services.scripture import build_context_block
-from app.core.llm import chat_complete
+from app.core.llm import chat_complete, SONNET
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -69,7 +69,7 @@ async def archaeology(request: ArchaeologyRequest) -> ArchaeologyResponse:
             {"role": "user", "content": user_message},
         ]
 
-        analysis = await chat_complete(messages, temperature=0.3, max_tokens=1200)
+        analysis = await chat_complete(messages, temperature=0.3, max_tokens=1200, model=SONNET)
 
         response = ArchaeologyResponse(
             concept=request.concept,

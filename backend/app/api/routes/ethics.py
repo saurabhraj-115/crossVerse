@@ -12,7 +12,7 @@ from app.models.schemas import EthicsRequest, EthicsResponse, ScriptureChunk
 from app.services.embeddings import embed_query
 from app.services.rag import _search_qdrant
 from app.services.scripture import build_context_block, SUPPORTED_RELIGIONS
-from app.core.llm import chat_complete
+from app.core.llm import chat_complete, SONNET
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -78,7 +78,7 @@ async def ethics_perspectives(request: EthicsRequest) -> EthicsResponse:
             {"role": "user", "content": user_msg},
         ]
 
-        raw = await chat_complete(messages, temperature=0.3, max_tokens=1500)
+        raw = await chat_complete(messages, temperature=0.3, max_tokens=1500, model=SONNET)
 
         # Parse the JSON response
         perspectives: Dict[str, str] = {}

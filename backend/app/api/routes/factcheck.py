@@ -10,7 +10,7 @@ from app.models.schemas import FactCheckRequest, FactCheckResponse, ScriptureChu
 from app.services.embeddings import embed_query
 from app.services.rag import _search_qdrant
 from app.services.scripture import build_context_block
-from app.core.llm import chat_complete
+from app.core.llm import chat_complete, HAIKU
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -67,7 +67,7 @@ async def fact_check(request: FactCheckRequest) -> FactCheckResponse:
             {"role": "user", "content": user_message},
         ]
 
-        raw = await chat_complete(messages, temperature=0.2, max_tokens=500)
+        raw = await chat_complete(messages, temperature=0.2, max_tokens=500, model=HAIKU)
 
         # Extract verdict token
         m = VERDICT_PATTERN.search(raw)

@@ -16,7 +16,7 @@ from app.models.schemas import DailyResponse, DailyPerspective, ScriptureChunk
 from app.services.embeddings import embed_query
 from app.services.rag import _search_qdrant
 from app.services.scripture import build_context_block, SUPPORTED_RELIGIONS
-from app.core.llm import chat_complete
+from app.core.llm import chat_complete, HAIKU
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -118,7 +118,7 @@ async def _pick_theme_from_news() -> tuple[Optional[str], Optional[str]]:
                 ),
             },
         ]
-        raw = await chat_complete(messages, temperature=0.2, max_tokens=80)
+        raw = await chat_complete(messages, temperature=0.2, max_tokens=80, model=HAIKU)
         lines = [l.strip() for l in raw.strip().splitlines() if l.strip()]
         if len(lines) < 2:
             return None, None
@@ -157,7 +157,7 @@ async def _get_daily_perspective(
         {"role": "user", "content": user_message},
     ]
 
-    reflection = await chat_complete(messages, temperature=0.5, max_tokens=150)
+    reflection = await chat_complete(messages, temperature=0.5, max_tokens=150, model=HAIKU)
     return religion, DailyPerspective(reflection=reflection, sources=chunks)
 
 

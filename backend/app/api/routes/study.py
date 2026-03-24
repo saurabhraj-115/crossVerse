@@ -12,7 +12,7 @@ from app.models.schemas import StudyRequest, StudyResponse, StudyDay, ScriptureC
 from app.services.embeddings import embed_query
 from app.services.rag import _search_qdrant
 from app.services.scripture import build_context_block, SUPPORTED_RELIGIONS
-from app.core.llm import chat_complete
+from app.core.llm import chat_complete, SONNET
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -47,7 +47,7 @@ async def _generate_study_plan_outline(topic: str, days: int) -> List[dict]:
         {"role": "user", "content": user_message},
     ]
 
-    raw = await chat_complete(messages, temperature=0.4)
+    raw = await chat_complete(messages, temperature=0.4, model=SONNET)
 
     m = re.search(r"\[.*\]", raw, re.DOTALL)
     if not m:

@@ -46,16 +46,21 @@ async def get_embeddings_batch(texts: list[str]) -> list[list[float]]:
     return [item.embedding for item in sorted(response.data, key=lambda x: x.index)]
 
 
+# Model tiers — import these in route files
+SONNET = "claude-sonnet-4-6"
+HAIKU = "claude-haiku-4-5-20251001"
+
+
 async def chat_complete(
     messages: list[dict],
     temperature: float = 0.2,
     max_tokens: int = 2048,
+    model: str | None = None,
 ) -> str:
     """Call Claude and return the assistant message content."""
     settings = get_settings()
     client = get_anthropic()
 
-    # Anthropic API separates system prompt from messages
     system_prompt = ""
     conversation = []
     for msg in messages:
@@ -65,7 +70,7 @@ async def chat_complete(
             conversation.append({"role": msg["role"], "content": msg["content"]})
 
     response = await client.messages.create(
-        model=settings.llm_model,
+        model=model or settings.llm_model,
         max_tokens=max_tokens,
         temperature=temperature,
         system=system_prompt,

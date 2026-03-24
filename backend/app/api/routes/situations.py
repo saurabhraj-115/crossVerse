@@ -10,7 +10,7 @@ from app.models.schemas import SituationRequest, SituationResponse, ScriptureChu
 from app.services.embeddings import embed_query
 from app.services.rag import _search_qdrant
 from app.services.scripture import build_context_block
-from app.core.llm import chat_complete
+from app.core.llm import chat_complete, HAIKU
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -71,7 +71,7 @@ async def get_situation_wisdom(request: SituationRequest) -> SituationResponse:
             {"role": "user", "content": user_message},
         ]
 
-        wisdom = await chat_complete(messages, temperature=0.4, max_tokens=600)
+        wisdom = await chat_complete(messages, temperature=0.4, max_tokens=600, model=HAIKU)
 
         response = SituationResponse(
             wisdom=wisdom,
