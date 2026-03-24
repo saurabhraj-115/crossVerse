@@ -221,7 +221,7 @@ export default function HomePage() {
           <p className="mb-10 text-center text-gray-500 dark:text-gray-400">
             From quick answers to deep cross-tradition analysis
           </p>
-          <div className="grid gap-6 sm:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 sm:grid-cols-3">
             {CORE_FEATURES.map((f) => <FeatureCard key={f.href} {...f} />)}
           </div>
         </div>
@@ -236,7 +236,7 @@ export default function HomePage() {
           <p className="mb-10 text-center text-gray-500 dark:text-gray-400">
             Visualize connections, trace ideas through history, and start each day with wisdom
           </p>
-          <div className="grid gap-6 sm:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 sm:grid-cols-3">
             {EXPLORE_FEATURES.map((f) => <FeatureCard key={f.href} {...f} />)}
           </div>
         </div>
@@ -251,7 +251,7 @@ export default function HomePage() {
           <p className="mb-10 text-center text-gray-500 dark:text-gray-400">
             Practical applications for scripture in your life
           </p>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {TOOLS_FEATURES.map((f) => <FeatureCard key={f.href} {...f} />)}
           </div>
         </div>
@@ -276,9 +276,9 @@ export default function HomePage() {
                 >
                   {emoji}
                 </div>
-                <div>
-                  <div className="font-bold text-white">{name}</div>
-                  <div className="text-sm text-gray-400">{text}</div>
+                <div className="min-w-0 overflow-hidden">
+                  <div className="truncate font-bold text-white">{name}</div>
+                  <div className="truncate text-sm text-gray-400">{text}</div>
                 </div>
                 <div className="ml-auto h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
               </div>

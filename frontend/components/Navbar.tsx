@@ -74,7 +74,7 @@ function Dropdown({ label, items, pathname }: DropdownProps) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-10 z-50 w-60 rounded-xl border border-gray-200 bg-white py-2 shadow-xl dark:border-gray-700 dark:bg-gray-900">
+        <div className="absolute right-0 top-10 z-50 w-[min(240px,calc(100vw-16px))] rounded-xl border border-gray-200 bg-white py-2 shadow-xl dark:border-gray-700 dark:bg-gray-900">
           {items.map(({ href, label: itemLabel, icon: Icon, desc }) => (
             <Link
               key={href}
@@ -138,6 +138,7 @@ export default function Navbar() {
   }, []);
 
   return (
+    <>
     <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/80">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         {/* Logo */}
@@ -195,7 +196,7 @@ export default function Navbar() {
           {mounted && (
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="ml-1 flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100 transition-colors"
+              className="ml-1 flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100 transition-colors"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
@@ -206,7 +207,7 @@ export default function Navbar() {
           <button
             onClick={() => setSettingsOpen(true)}
             title="Preferences (⌘,)"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100 transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100 transition-colors"
             aria-label="Open settings"
           >
             <Settings size={16} />
@@ -216,5 +217,6 @@ export default function Navbar() {
 
     </nav>
     <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+    </>
   );
 }
