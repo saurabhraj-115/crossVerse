@@ -89,15 +89,16 @@ async def _fetch_news_headlines() -> List[str]:
     return []
 
 
-async def _pick_theme_from_news() -> Optional[str]:
+async def _pick_theme_from_news() -> tuple[Optional[str], Optional[str]]:
     """
     Fetch today's top news headlines and ask Claude to distil them into
-    a single universal spiritual/ethical theme. Returns None on any failure.
+    a single universal spiritual/ethical theme.
+    Returns (theme, source_headline) or (None, None) on failure.
     """
     try:
         headlines = await _fetch_news_headlines()
         if not headlines:
-            return None
+            return None, None
 
         numbered = "\n".join(f"{i+1}. {h}" for i, h in enumerate(headlines))
         messages = [
@@ -108,19 +109,29 @@ async def _pick_theme_from_news() -> Optional[str]:
                     f"Today's top news headlines:\n{numbered}\n\n"
                     "Identify the single most spiritually or ethically significant theme "
                     "that ALL twelve world religions could meaningfully address. "
-                    "Return only the 2-4 word lowercase theme phrase."
+                    "Reply with exactly two lines:\n"
+                    "LINE1: the 2-4 word lowercase theme phrase\n"
+                    "LINE2: the exact headline number (just the digit) that most inspired it"
                 ),
             },
         ]
-        theme = await chat_complete(messages, temperature=0.3, max_tokens=20)
-        theme = theme.strip().strip('"').strip("'").lower()
-        # Sanity check — reject if Claude returned a long sentence
+        raw = await chat_complete(messages, temperature=0.3, max_tokens=30)
+        lines = [l.strip() for l in raw.strip().splitlines() if l.strip()]
+        theme = lines[0].strip('"').strip("'").lower() if lines else None
+        source_headline = None
+        if len(lines) >= 2:
+            try:
+                idx = int(lines[1]) - 1
+                if 0 <= idx < len(headlines):
+                    source_headline = headlines[idx]
+            except ValueError:
+                pass
         if theme and len(theme.split()) <= 6:
-            return theme
-        return None
+            return theme, source_headline
+        return None, None
     except Exception as e:
         logger.warning("Theme-from-news failed: %s", e)
-        return None
+        return None, None
 
 
 async def _get_daily_perspective(
@@ -167,10 +178,10 @@ async def daily_briefing(fresh: bool = False) -> DailyResponse:
         if not fresh and today_str in _cache:
             return _cache[today_str]
 
+        headline: Optional[str] = None
         if fresh:
             offset = random.randint(3, 30)
-            # Always try news for fresh too, but allow fallback
-            theme = await _pick_theme_from_news()
+            theme, headline = await _pick_theme_from_news()
             if not theme:
                 day_of_year = date.today().timetuple().tm_yday
                 default_idx = day_of_year % len(THEMES)
@@ -178,7 +189,7 @@ async def daily_briefing(fresh: bool = False) -> DailyResponse:
                 theme = THEMES[random.choice(other_indices)]
         else:
             offset = 0
-            theme = await _pick_theme_from_news()
+            theme, headline = await _pick_theme_from_news()
             if not theme:
                 import hashlib
                 seed = int(hashlib.md5(today_str.encode()).hexdigest(), 16)
@@ -207,6 +218,7 @@ async def daily_briefing(fresh: bool = False) -> DailyResponse:
             theme=theme,
             date=today_str,
             perspectives=perspectives,
+            headline=headline,
         )
 
         if not fresh:
